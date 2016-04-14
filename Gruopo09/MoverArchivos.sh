@@ -1,15 +1,22 @@
+#!/bin/bash
+# Comando: Start
+
+
+
 Error=1
 OK=0
 
+#Pueden venir 2 o 3 parametros.
 if [ $# -lt 2 -o $# -gt 3 ]
 then
     exit $Error
 else
+	#Si vienen 3 es porque el ultimo es el invocador, opcional
     if  [ $# -eq 3 ]
     then
-        Comando=$3
+        Invocador=$3
     fi
-    Archivo=${1##*/}
+	Archivo=${1##*/}
     Origen=${1%/*}
     Destino=$2
 
@@ -21,16 +28,16 @@ else
     #Si el origen es igual al destino no mover
     elif [ "$Origen" == "$Destino" ]
     then
-        exit $Ok
+        exit $Error
 
     #Si el Archivo ya existe en el Destino generer un duplicado
     elif [ -f "$Destino/$Archivo" ]
     then
         #Si no existe un subdirectorio /dup en Destino
-        if [ ! -d "$Destino/dup" ]
+        if [ ! -d "$Destino/dpl" ]
         then
 	     #Creo el subdirectorio
-            `mkdir "$Destino/dup"`
+            `mkdir "$Destino/dpl"`
         fi
                 
         #Obtengo el numero de secuencia
@@ -63,7 +70,7 @@ else
 	exit $Ok
         
     else
-	#Realizo el move a Destino
+	#Muevo de destino
 	`mv "$Origen/$Archivo" "$Destino"`
 	
  	exit $Ok
