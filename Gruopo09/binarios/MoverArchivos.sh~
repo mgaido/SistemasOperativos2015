@@ -1,0 +1,78 @@
+#!/bin/bash
+# Comando: MoverArchivos
+
+
+
+Error=1
+OK=0
+Invocador=""
+#Pueden venir 2 o 3 parametros.
+if [ $# -lt 2 -o $# -gt 3 ]; then
+	exit $Error
+else
+	#Si vienen 3 es porque el ultimo es el invocador, opcional
+	if  [ $# -eq 3 ]; then
+		Invocador=$3
+	fi
+
+	Archivo=${1##*/}
+	Origen=${1%/*}
+	Destino=$2
+
+	#Si el origen o el destino no existen retornar error
+	if [ ! -d "$Origen" -o  ! -d "$Destino" ]; then
+		if [ ! $Invocador = "" ]; then
+			./GrabarBitacora.sh $Invocador "Error al mover archivo" ERR
+		fi
+		exit $Error
+
+	#Si el origen es igual al destino no mover
+	elif [ "$Origen" == "$Destino" ]; then
+		if [ ! $Invocador = "" ]; then
+			./GrabarBitacora.sh $Invocador "Error al mover archivo" ERR
+		fi
+		exit $Error
+
+	#Si el Archivo ya existe en el Destino generer un duplicado
+	elif [ -f "$Destino/$Archivo" ]; then
+		#Si no existe un subdirectorio /dup en Destino
+		if [ ! -d "$Destino/dpl" ]; then
+		#Creo el subdirectorio
+			`mkdir "$Destino/dpl"`
+		fi
+                       
+       		#Obtengo el usuario
+        	Usuario=`whoami`
+
+		#Obtengo la fecha
+		Fecha=`date`
+    
+		Num=001
+		echo "$Destino/dpl/$Archivo.$Num"
+		while [ -a "$Destino/dpl/$Archivo.$Num" ]; do
+			Num=$[$Num+1]
+			if [ $Num -gt 9 ]; then
+				Num=0$Num
+			elif [ $Num -gt 99 ]; then
+				Num=$Num
+			else
+				Num=00$Num
+			fi
+		done
+		echo $Num
+		
+
+		#Copio el archivo a Destino/dup
+		cp "$Origen/$Archivo" "$Destino/dpl/$Archivo.$Num"
+		
+			#Borro el archivo
+		rm "$Origen/$Archivo"
+		
+		exit $Ok
+        
+    else
+	#Muevo de destino
+	`mv "$Origen/$Archivo" "$Destino"`
+ 	exit $Ok
+    fi
+fi
