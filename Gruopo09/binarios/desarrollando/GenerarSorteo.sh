@@ -81,23 +81,23 @@ else
 				`mkdir $PROCDIR"/sorteos"`
 			fi
 			
-			if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch".txt" ]; then
-				CantLineas=`wc -l $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch".txt" | sed 's/^\([0-9]*\).*/\1/g'`
+			if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch ]; then
+				CantLineas=`wc -l $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch | sed 's/^\([0-9]*\).*/\1/g'`
 				while [ $CantLineas -gt 167 ]; do
 					IdSorteo=$[$IdSorteo+1]
-					if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch".txt" ]; then
-					CantLineas=`wc -l $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch".txt" | sed 's/^\([0-9]*\).*/\1/g'`
+					if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch ]; then
+					CantLineas=`wc -l $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch | sed 's/^\([0-9]*\).*/\1/g'`
 					else
 					CantLineas=0
 					fi
 				done
-				if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch".txt" ]; then
-					echo "Numero de Orden $IteracionSorteo -> $ResultadoSorteo">>$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch".txt"
+				if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch ]; then
+					echo "$IteracionSorteo,$ResultadoSorteo">>$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch
 				else
-					echo "Numero de Orden $IteracionSorteo -> $ResultadoSorteo">$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch".txt"
+					echo "$IteracionSorteo,$ResultadoSorteo">$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch
 				fi
 			else
-				echo "Numero de Orden $IteracionSorteo -> $ResultadoSorteo">$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch".txt"
+				echo "$IteracionSorteo,$ResultadoSorteo">$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch
 			fi
 			IteracionSorteo=$[$IteracionSorteo+1]
 			FCvector
