@@ -4,6 +4,7 @@ PROCDIR="../procesados"
 MAEDIR="../maestros"
 OKDIR="../aceptados"
 NOKDIR="../rechazados"
+CONFIG="../config"
 
 WHO=`whoami`
 WHEN=`date`
@@ -48,7 +49,7 @@ elif [ $Palabras -lt 1 ]; then
 else
 	for (( linea=1; linea<=$Lineas; linea=$[$linea+1] )); do
 		./GrabarBitacora.sh GenerarSorteo "Inicio de Sorteo" INFO
-		IdSorteo=`cat "../CIPAK.cnf" | fgrep 'IDSORTEO' | sed 's/IDSORTEO=\([0-9]*\)=.*=.*/\1/g'`
+		IdSorteo=`cat "$CONFIG/CIPAK.cnf" | fgrep 'IDSORTEO' | sed 's/IDSORTEO=\([0-9]*\)=.*=.*/\1/g'`
 		nombreArch=`head -$linea $MAEDIR"/FechasAdj.csv" | tail -1 | sed 's/^\([^;]*\).*/\1/g' | sed 's/\//-/g'`
 		ResultadoSorteo=169
 		IteracionSorteo=1
@@ -98,9 +99,9 @@ else
 	
 
 		done
-		cp "../CIPAK.cnf" "../CIPAK.cnf2"
-		cat ../CIPAK.cnf2 | sed "s/^IDSORTEO=[0-9]*=.*=.*/IDSORTEO=$[$IdSorteo+1]=$WHO=$WHEN/g" > "../CIPAK.cnf"
-		rm "../CIPAK.cnf2"
+		cp "$CONFIG/CIPAK.cnf" "$CONFIG/CIPAK.cnf2"
+		cat $CONFIG/CIPAK.cnf2 | sed "s/^IDSORTEO=[0-9]*=.*=.*/IDSORTEO=$[$IdSorteo+1]=$WHO=$WHEN/g" > "$CONFIG/CIPAK.cnf"
+		rm "$CONFIG/CIPAK.cnf2"
 		./GrabarBitacora.sh GenerarSorteo "Fin de Sorteo" INFO
 	done
 	#echo "">$MAEDIR"FechasAdj.csv"
