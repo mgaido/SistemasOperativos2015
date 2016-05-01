@@ -14,6 +14,7 @@ INFODIR=/home/$USER/Grupo09/informes=$USER=$(date '+%Y-%m-%d %H:%M:%S')
 LOGDIR=/home/$USER/Grupo09/bitacoras=$USER=$(date '+%Y-%m-%d %H:%M:%S')
 NOKDIR=/home/$USER/Grupo09/rechazados=$USER=$(date '+%Y-%m-%d %H:%M:%S')
 CONFDIR=/home/$USER/Grupo09/config=$USER=$(date '+%Y-%m-%d %H:%M:%S')
+IDSORTEO=1=$USER=$(date '+%Y-%m-%d %H:%M:%S')
 " > CIPAK.cnf
 fi
 cd ..
