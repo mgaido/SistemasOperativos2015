@@ -2,7 +2,7 @@
 # *************************************************************************** #
 #           TP Sistemas Operativos - Grupo 09 1er Cuatrimestre 2016           #
 # *************************************************************************** #
-# *****************  Proceso "procesarOfertas.sh" *************************** #
+# *****************  Proceso "ProcesarOfertas.sh" *************************** #
 # *************************************************************************** #
 #                           Descripción:                                      #
 #                                                                             #
@@ -14,7 +14,7 @@
 #     de procesados ($PROCDIR). Si hay un duplicado se registra en el log.    #
 #   3- Valida la cantidad de campos del primer registro. Si la cantidad de    #
 #     campos no es la correspondiente, se registra el evento en el log.       #
-#
+#                                                                             #
 # En caso de fallar las anteriores validaciones, el archivo se mueve a el     #
 # directorio de archivos (completos) rechazados ($NOKDIR).                    #
 #                                                                             #
@@ -27,7 +27,7 @@
 # directorio de registros válidos, en su archivo correspondiente (.txt).      #
 # En caso de ser rechazado el registro, se realiza una escritura en el        #
 # archivo correspondiente (.rech) en el directorio de registros rechazados.   #
-#
+#                                                                             #
 # A cada registro que se procesa, se actualizan los contadores de registros   #
 # procesados, validos y rechazados.                                           #
 # Al finalizar el procesamiento de un archivo, se colocan en 0 nuevamente los #
@@ -53,11 +53,9 @@ LOGDIR=$GRUPO/bitacoras
 CONFDIR=$GRUPO/config
 
 logInicio(){
-  cantidadArchivos=$(ls -l $OKDIR/*.csv.xls | wc -l)
-  echo 'Inicio de '$comando
   bash GrabarBitacora.sh $comando 'Inicio de '$comando 'INFO'
-  echo 'Cantidad de archivos a procesar: '$cantidadArchivos
-  bash GrabarBitacora.sh $comando 'Cantidad de archivos a procesar: '$cantidadArchivos 'INFO'
+  archivosAProcesar=$(find $OKDIR -name '*.csv.xls' | wc -l)
+  bash GrabarBitacora.sh $comando 'Cantidad de archivos a procesar: '$archivosAProcesar 'INFO'
 }
 
 chequearEntero(){
@@ -357,7 +355,11 @@ procesarArchivo(){
 
 main(){
   logInicio
-
+  archivosAProcesar=$( find $OKDIR -name '*.csv.xls' | wc -l )
+  if [[ $archivosAProcesar == 0 ]]; then
+    bash GrabarBitacora.sh $comando 'Fin de procesar ofertas' 'INFO'
+    return
+  fi
   fechaAdjudicacion=`buscarFechaAdjudicacion`
   if [[ $fechaAdjudicacion != 0 ]]; then
     for filename in $OKDIR/*.csv.xls; do
@@ -388,3 +390,4 @@ main(){
   return
 }
 main
+exit
