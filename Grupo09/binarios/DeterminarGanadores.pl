@@ -2,8 +2,8 @@
 use Data::Dumper;
 	#
 	# #< para leer
-$dir_licitacion = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/procesados/validas/";
-$directorio = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/procesados/sorteos/";
+$dir_licitacion = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/validas/";
+$directorio = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/sorteos/";
 $dir_grupo = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/maestros/grupos.csv.xls";
 $dir_clientes = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/maestros/temaK_padron.csv.xls";
 $grabar = 0; #seria falso
@@ -11,33 +11,48 @@ $cantidad_consultas = 11;
 
 if (un_solo_proceso() == 0){
 	print "No se puede ejecutar porque ya existe otro comando en ejecución\n";
-}else{
-	menu_principal();
+	exit;
+}
+if (ambiente_inicializado() == 0){
+	print "No se puede ejecutar porque al ambiente no inicializo de manera correcta\n";
+	print "Por favor revise que las siguientes carpetas existan:\n";
+	print "-/procesados/sorteo/\n";
+	print "-/procesados/validas/\n";
+	exit;
 }
 
+menu_principal();
 
+
+;
+
+sub ambiente_inicializado(){
+	if (opendir(DIR,$directorio) && opendir(OTRO_DIR,$dir_licitacion)){
+		#print "existen ambas carpetas\n";
+		close(DIR);
+		close(OTRO_DIR);
+		return 1;
+	}
+	else{
+		#print "no existen ambas carpetas sorteos";
+		return 0;
+	}
+}
 
 sub un_solo_proceso{
 	system("clear");
 	if (open(FILE, "ps -Af|")){
-		#print "pepe\n";
 		$cont=0;
 		while (my $linea = <FILE>){
-			#print "$linea\n";
 			if($linea=~/DeterminarGanadores.pl/){
 				$cont++;
 			}
 		}
 		if ( 1 < $cont ){
-			#print "sí hay otro proceso corriendo\n";
-			#print "cantidad es:$cont\n";
 			return 0;
 		}
-		#print "no hay otro proc corriendo";
-		#print "cantidad es:$cont";
 		return 1;
 	}
-	#print "cantidad es:$cont\n";
 	return 1;
 }
 
@@ -67,6 +82,7 @@ sub menu_principal_ayuda(){
 	print "Eliga una opción A B C D\n";
 	print "Si desea ayuda para una opción ingrese: [opción] -a (A -a)\n";
 	print "Si desea que la consulta sea grabada en un archivo ingrese: [opción] -g (B -g)\n";
+	print "Si desea salir, no ingrese ninguna letra\n";
 	elegir_opcion();
 }
 
@@ -74,6 +90,10 @@ sub solicitar_id{
 	print "Por favor ingrese el ID del sorteo que desea procesar:";
 	my $id = <STDIN>;
 	chomp $id;
+	if ($id eq "-a"){
+		print "Debe ingresar un valor numérico\n";
+		$id = &solicitar_id();
+	}
 	$id;
 }
 
@@ -86,12 +106,30 @@ sub elegir_opcion{
 	if ($opcion eq "C"){&opcion_c();}
 	if ($opcion eq "D"){&opcion_d();}
 	if ($opcion eq "-a"){&menu_principal_ayuda();}
-	if ($opcion eq "A -a"){print "ayuda para A\n";}
-	if ($opcion eq "B -a"){print "ayuda para B\n";}
-	if ($opcion eq "C -a"){print "ayuda para C\n";}
-	if ($opcion eq "D -a"){print "ayuda para D\n";}
+	if ($opcion eq "A -a"){ayuda_a();}
+	if ($opcion eq "B -a"){ayuda_b();}
+	if ($opcion eq "C -a"){ayuda_c();}
+	if ($opcion eq "D -a"){ayuda_d();}
 }
 
+
+sub ayuda_a(){
+	system("clear");
+	print "Bienvenido al programa para Determinar ganadores                       Cantidad de consultas disponibles:[$cantidad_consultas]\n";
+	print "[A] - Resultado general del sorteo\n";
+	print "B - Ganadores por sorteo\n";
+	print "C - Ganadores por licitación\n";
+	print "D - Resultados por grupo\n";
+	print "\n";
+	print "Con esta opción debe debe ingresar un ID de sorteo\n";
+	print "Se mostrará toda la información respecto a ID ingresado\n";
+	print "La información a mostrar será con el siguiente formato:\n";
+	print "\n";
+	print "Nro. de Sorteo XX, le correspondió al número de orden YY\n";
+	print "\n";
+	print "Si desea salir, no ingrese ninguna letra\n";
+	elegir_opcion();
+}
 
 sub opcion_a{
 	system("clear");
@@ -112,6 +150,27 @@ sub opcion_a{
 	print "\n";
 	&realizar_consulta();
 }
+
+sub ayuda_b(){
+	system("clear");
+	print "Bienvenido al programa para Determinar ganadores                       Cantidad de consultas disponibles:[$cantidad_consultas]\n";
+	print "A - Resultado general del sorteo\n";
+	print "[B] - Ganadores por sorteo\n";
+	print "C - Ganadores por licitación\n";
+	print "D - Resultados por grupo\n";
+	print "\n";
+	print "Con esta opción debe debe ingresar un ID de sorteo\n";
+	print "Se mostrará toda la información respecto a ID ingresado y los Grupos ingresados\n";
+	print "La información a mostrar será con el siguiente formato:\n";
+	print "\n";
+	print "Ganador por sorteo del grupo XX: Nro de orden YY,ZZ(Nro de sorteo WW)\n";
+	print "\n";
+	print "Los grupos que no se encuentren o sean CERRRADOS no se procesan\n";
+	print "Si desea salir, no ingrese ninguna letra\n";
+	elegir_opcion();
+}
+
+
 
 sub opcion_b{
 	system ("clear");
@@ -134,6 +193,24 @@ sub opcion_b{
 	&realizar_consulta();
 }
 
+sub ayuda_c(){
+	system("clear");
+	print "Bienvenido al programa para Determinar ganadores                       Cantidad de consultas disponibles:[$cantidad_consultas]\n";
+	print "A - Resultado general del sorteo\n";
+	print "B - Ganadores por sorteo\n";
+	print "[C] - Ganadores por licitación\n";
+	print "D - Resultados por grupo\n";
+	print "\n";
+	print "Con esta opción debe debe ingresar un ID de sorteo\n";
+	print "Se mostrará toda la información respecto al ID y los Grupos ingresado\n";
+	print "La información a mostrar será con el siguiente formato:\n";
+	print "\n";
+	print "Ganador por licitación del grupo XX: numero de orden YY, /*nombre*/ con /*importe*/ (Nro de Sorteo ZZ)\n";
+	print "\n";
+	print "Si desea salir, no ingrese ninguna letra\n";
+	elegir_opcion();
+}
+
 
 sub opcion_c{
 	system ("clear");
@@ -151,6 +228,27 @@ sub opcion_c{
 	}
 	print "\n";
 	&realizar_consulta();
+}
+
+sub ayuda_d(){
+	system("clear");
+	print "Bienvenido al programa para Determinar ganadores                       Cantidad de consultas disponibles:[$cantidad_consultas]\n";
+	print "A - Resultado general del sorteo\n";
+	print "B - Ganadores por sorteo\n";
+	print "C - Ganadores por licitación\n";
+	print "[D] - Resultados por grupo\n";
+	print "\n";
+	print "Con esta opción debe debe ingresar un ID de sorteo\n";
+	print "Se mostrará toda la información respecto a ID ingresado y los Grupos ingresados\n";
+	print "La información a mostrar será con el siguiente formato:\n";
+	print "\n";
+	print "Ganadores por Grupo en el acto de adjudicación de fecha:XX, Sorteo: IDYY)\n";
+	print "/*grupo*/-/*nro de orden*/ S ( /*nombre*/)\n";
+	print "/*grupo*/-/*nro de orden*/ L ( /*nombre*/)\n";
+	print "\n";
+	print "Los grupos que no se encuentren o sean CERRRADOS no se procesan\n";
+	print "Si desea salir, no ingrese ninguna letra\n";
+	elegir_opcion();
 }
 
 
@@ -264,7 +362,7 @@ sub obtener_ganador_grupo{
 #esta subrutina debe recibir el ID del sorteo y devolver el nombre del archivo
 #que tiene el ID ingresado
 sub obtener_nombre_archivo_sorteo{
-	$comparar = "ID".@_."_";
+	my $comparar = "ID".@_[0]."_";
 	if(opendir(DIR,$directorio)){
 		@lista = readdir(DIR);
 		foreach $file (@lista){
