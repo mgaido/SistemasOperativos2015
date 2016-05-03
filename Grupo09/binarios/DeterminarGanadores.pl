@@ -9,31 +9,35 @@ $dir_clientes = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/maestros/temaK_padron.
 $grabar = 0; #seria falso
 $cantidad_consultas = 11;
 
-# if (un_solo_proceso() == 0){
-# 	print "Un proceso de perl se esta ejecutando\n";
-# }else{
+if (un_solo_proceso() == 0){
+	print "No se puede ejecutar porque ya existe otro comando en ejecución\n";
+}else{
 	menu_principal();
-#}
+}
 
 
 
 sub un_solo_proceso{
-	print "entré";
+	system("clear");
 	if (open(FILE, "ps -Af|")){
-		print "pepe";
+		#print "pepe\n";
 		$cont=0;
 		while (my $linea = <FILE>){
-			print "$linea\n";
+			#print "$linea\n";
 			if($linea=~/DeterminarGanadores.pl/){
 				$cont++;
 			}
 		}
-		if ( 0 < $cont ){
-			print "cantidad es:$cont";
+		if ( 1 < $cont ){
+			#print "sí hay otro proceso corriendo\n";
+			#print "cantidad es:$cont\n";
 			return 0;
 		}
+		#print "no hay otro proc corriendo";
+		#print "cantidad es:$cont";
 		return 1;
 	}
+	#print "cantidad es:$cont\n";
 	return 1;
 }
 
@@ -48,6 +52,7 @@ sub menu_principal(){
 	print "B - Ganadores por sorteo\n";
 	print "C - Ganadores por licitación\n";
 	print "D - Resultados por grupo\n";
+	print "Si desea salir, no ingrese ninguna letra\n";
 	elegir_opcion();
 }
 
