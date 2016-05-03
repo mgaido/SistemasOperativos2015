@@ -70,9 +70,9 @@ verificarArchivosFaltantes()
 	[[ -f "$BINDIR/RecibirOfertas.sh" ]] || return 0
 	[[ -f "$BINDIR/GenerarSorteo.sh" ]] || return 0
 	[[ -f "$BINDIR/ProcesarOfertas.sh" ]] || return 0
-	[[ -f "$BINDIR/DeterminarGanadores.pl" ]] || return 0
-	[[ -f "$BINDIR/LanzarProceso.sh" ]] || return 0
-	[[ -f "$BINDIR/DetenerProceso.sh" ]] || return 0
+	#[[ -f "$BINDIR/DeterminarGanadores.pl" ]] || return 0
+	#[[ -f "$BINDIR/LanzarProceso.sh" ]] || return 0
+	#[[ -f "$BINDIR/DetenerProceso.sh" ]] || return 0
 	[[ -f "$BINDIR/MoverArchivos.sh" ]] || return 0
 	[[ -f "$BINDIR/GrabarBitacora.sh" ]] || return 0
 	[[ -f "$BINDIR/MostrarBitacora.sh" ]] || return 0
@@ -138,9 +138,9 @@ copiarFaltantes()
 	copiar ./resguardo/binarios/RecibirOfertas.sh "$BINDIR/RecibirOfertas.sh" 
 	copiar ./resguardo/binarios/enerarSorteo.sh "$BINDIR/GenerarSorteo.sh" 
 	copiar ./resguardo/binarios/ProcesarOfertas.sh "$BINDIR/ProcesarOfertas.sh" 
-	copiar $BACKUP/binarios/DeterminarGanadores.pl "$BINDIR/DeterminarGanadores.pl" 
-	copiar $BACKUP/binarios/LanzarProceso.sh "$BINDIR/LanzarProceso.sh" 
-	copiar $BACKUP/binarios/DetenerProceso.sh "$BINDIR/DetenerProceso.sh" 
+	#copiar $BACKUP/binarios/DeterminarGanadores.pl "$BINDIR/DeterminarGanadores.pl" 
+	#copiar $BACKUP/binarios/LanzarProceso.sh "$BINDIR/LanzarProceso.sh" 
+	#copiar $BACKUP/binarios/DetenerProceso.sh "$BINDIR/DetenerProceso.sh" 
 	copiar ./resguardo/binarios/MoverArchivos.sh "$BINDIR/MoverArchivos.sh" 
 	copiar ./resguardobinarios/GrabarBitacora.sh "$BINDIR/GrabarBitacora.sh" 
 	copiar ./resguardo/binarios/MostrarBitacora.sh "$BINDIR/MostrarBitacora.sh" 
@@ -167,9 +167,9 @@ verificarPermisos()
 	verificarPermisoEjecucion "$BINDIR/RecibirOfertas.sh" || return 1		
 	verificarPermisoEjecucion "$BINDIR/GenerarSorteo.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/ProcesarOfertas.sh" || return 1
-	verificarPermisoEjecucion "$BINDIR/DeterminarGanadores.pl" || return 1
-	verificarPermisoEjecucion "$BINDIR/LanzarProceso.sh" || return 1
-	verificarPermisoEjecucion "$BINDIR/DetenerProceso.sh" || return 1
+	#verificarPermisoEjecucion "$BINDIR/DeterminarGanadores.pl" || return 1
+	#verificarPermisoEjecucion "$BINDIR/LanzarProceso.sh" || return 1
+	#verificarPermisoEjecucion "$BINDIR/DetenerProceso.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/MoverArchivos.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/GrabarBitacora.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/MostrarBitacora.sh" || return 1

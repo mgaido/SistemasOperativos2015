@@ -1,8 +1,10 @@
 #!/bin/bash
 # Comando: GenerarSorteo
+PROCDIR="../procesados"
+MAEDIR="../maestros"
+OKDIR="../aceptados"
+NOKDIR="../rechazados"
 
-WHO=`whoami`
-WHEN=`date`
 function Fvector {
 	ValoresPorSortear=168
 	NumArch=1
@@ -44,7 +46,7 @@ elif [ $Palabras -lt 1 ]; then
 else
 	for (( linea=1; linea<=$Lineas; linea=$[$linea+1] )); do
 		./GrabarBitacora.sh GenerarSorteo "Inicio de Sorteo" INFO
-		IdSorteo=`cat "$CONFIG/CIPAK.cnf" | fgrep 'IDSORTEO' | sed 's/IDSORTEO=\([0-9]*\)=.*=.*/\1/g'`
+		IdSorteo=1
 		nombreArch=`head -$linea $MAEDIR"/FechasAdj.csv" | tail -1 | sed 's/^\([^;]*\).*/\1/g' | sed 's/\//-/g'`
 		ResultadoSorteo=169
 		IteracionSorteo=1
@@ -81,11 +83,19 @@ else
 			
 			if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch ]; then
 				CantLineas=`wc -l $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch | sed 's/^\([0-9]*\).*/\1/g'`
-				if [ $CantLineas -gt 167 ]; then
-					rm "$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch"
-				fi	
-
-				echo "$IteracionSorteo,$ResultadoSorteo">>$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch
+				while [ $CantLineas -gt 167 ]; do
+					IdSorteo=$[$IdSorteo+1]
+					if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch ]; then
+					CantLineas=`wc -l $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch | sed 's/^\([0-9]*\).*/\1/g'`
+					else
+					CantLineas=0
+					fi
+				done
+				if [ -a $PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch ]; then
+					echo "$IteracionSorteo,$ResultadoSorteo">>$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch
+				else
+					echo "$IteracionSorteo,$ResultadoSorteo">$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch
+				fi
 			else
 				echo "$IteracionSorteo,$ResultadoSorteo">$PROCDIR"/sorteos/ID$IdSorteo"_$nombreArch
 			fi
@@ -94,11 +104,8 @@ else
 	
 
 		done
-		cp "$CONFIG/CIPAK.cnf" "$CONFIG/CIPAK.cnf2"
-		cat $CONFIG/CIPAK.cnf2 | sed "s/^IDSORTEO=[0-9]*=.*=.*/IDSORTEO=$[$IdSorteo+1]=$WHO=$WHEN/g" > "$CONFIG/CIPAK.cnf"
-		rm "$CONFIG/CIPAK.cnf2"
 		./GrabarBitacora.sh GenerarSorteo "Fin de Sorteo" INFO
 	done
 	#echo "">$MAEDIR"FechasAdj.csv"
-	#./MoverArchivos.sh "$MAEDIR/FechasAdj.csv" $OKDIR
+	./MoverArchivos.sh "$MAEDIR/FechasAdj.csv" $OKDIR
 fi
