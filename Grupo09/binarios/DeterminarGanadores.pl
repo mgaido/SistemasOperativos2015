@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 use Data::Dumper;
+
 	#
 	# #< para leer
+$dir_reportes = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/reportes/";
 $dir_licitacion = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/validas/";
 $directorio = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/sorteos/";
 $dir_grupo = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/maestros/grupos.csv.xls";
@@ -9,22 +11,28 @@ $dir_clientes = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/maestros/temaK_padron.
 $grabar = 0; #seria falso
 $cantidad_consultas = 11;
 
+#
+# $cadena = "A -a";
+# if ($cadena =~ /A$/){print "tiene una A\n";}
+# if ($cadena =~ /B$/){print "tiene una B\n";}
+# if ($cadena =~ /C$/){print "tiene una C\n";}
+# if ($cadena =~ /A -a$/){print "Ayuda A\n";}
+
 if (un_solo_proceso() == 0){
 	print "No se puede ejecutar porque ya existe otro comando en ejecución\n";
 	exit;
-}
-if (ambiente_inicializado() == 0){
-	print "No se puede ejecutar porque al ambiente no inicializo de manera correcta\n";
-	print "Por favor revise que las siguientes carpetas existan:\n";
-	print "-/procesados/sorteo/\n";
-	print "-/procesados/validas/\n";
-	exit;
-}
-
+	}
+	if (ambiente_inicializado() == 0){
+		print "No se puede ejecutar porque al ambiente no inicializo de manera correcta\n";
+		print "Por favor revise que las siguientes carpetas existan:\n";
+		print "-/procesados/sorteo/\n";
+		print "-/procesados/validas/\n";
+		exit;
+	}
 menu_principal();
 
 
-;
+
 
 sub ambiente_inicializado(){
 	if (opendir(DIR,$directorio) && opendir(OTRO_DIR,$dir_licitacion)){
@@ -99,17 +107,25 @@ sub solicitar_id{
 
 sub elegir_opcion{
 	print "Por favor eliga un opción: ";
-	$opcion = <STDIN>;
+	my $opcion = <STDIN>;
 	chomp $opcion;
-	if ($opcion eq "A"){&opcion_a();}
-	if ($opcion eq "B"){&opcion_b();}
-	if ($opcion eq "C"){&opcion_c();}
-	if ($opcion eq "D"){&opcion_d();}
-	if ($opcion eq "-a"){&menu_principal_ayuda();}
-	if ($opcion eq "A -a"){ayuda_a();}
-	if ($opcion eq "B -a"){ayuda_b();}
-	if ($opcion eq "C -a"){ayuda_c();}
-	if ($opcion eq "D -a"){ayuda_d();}
+	print "opcion:$opcion";
+	if ($opcion ne "") {
+		if ($opcion =~ /-g/){
+			$grabar = 1;
+			print "debo grabar";
+			if (!opendir(DIR,$dir_reportes)){system("mkdir $dir_reportes");} else {close(DIR);}
+	}else{$grabar = 0;}
+		if ($opcion =~ /A$/ || $opcion =~ /A -g$/){&opcion_a();exit;}
+		if ($opcion =~ /B$/ || $opcion =~ /B -g$/){&opcion_b();exit;}
+		if ($opcion =~ /C$/ || $opcion =~ /C -g$/){&opcion_c();exit;}
+		if ($opcion =~ /D$/ || $opcion =~ /D -g$/){&opcion_d();exit;}
+		if ($opcion =~ /A -a$/){ayuda_a();exit;}
+		if ($opcion =~ /B -a$/){ayuda_b();exit;}
+		if ($opcion =~ /C -a$/){ayuda_c();exit;}
+		if ($opcion =~ /D -a$/){ayuda_d();exit;}
+		if ($opcion eq "-a"){&menu_principal_ayuda();exit;}
+	}
 }
 
 
@@ -318,6 +334,7 @@ sub pedir_grupo{
 	print "Solicitación de grupos/s a procesar\n";
 	print "Si desea ingresar un rango de grupos ingrese: grupo1-grupo2\n";
 	print "Si desea ingresar distinto grupos ingrese: grupo1 grupo2 grupo3\n";
+	print "Si desea procesar TODOS los grupos no debe ingresar nada\n";
 	print "Por favor ingrese el/los grupo/s que desea procesar:";
 	my $grupo = <STDIN>;
 	chomp $grupo;
