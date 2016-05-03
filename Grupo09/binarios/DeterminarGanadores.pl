@@ -6,8 +6,8 @@ use Data::Dumper;
 $dir_reportes = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/reportes/";
 $dir_licitacion = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/validas/";
 $directorio = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/sorteos/";
-$dir_grupo = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/maestros/grupos.csv.xls";
-$dir_clientes = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/maestros/temaK_padron.csv.xls";
+$dir_grupo = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros/grupos.csv.xls";
+$dir_clientes = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros/temaK_padron.csv.xls";
 $grabar = 0; #seria falso
 $cantidad_consultas = 11;
 
@@ -115,7 +115,7 @@ sub elegir_opcion{
 			$grabar = 1;
 			print "debo grabar";
 			if (!opendir(DIR,$dir_reportes)){system("mkdir $dir_reportes");} else {close(DIR);}
-	}else{$grabar = 0;}
+	}else{print "no debo grabar";$grabar = 0;}
 		if ($opcion =~ /A$/ || $opcion =~ /A -g$/){&opcion_a();exit;}
 		if ($opcion =~ /B$/ || $opcion =~ /B -g$/){&opcion_b();exit;}
 		if ($opcion =~ /C$/ || $opcion =~ /C -g$/){&opcion_c();exit;}
@@ -158,10 +158,23 @@ sub opcion_a{
 	my %hash;
 	$hash{$hash_sorteo{$_}} = $_ for(keys %hash_sorteo);
 	system("clear");
+	if ($grabar == 1) {
+		print "voy a grabar";
+		my $nombre = $dir_reportes.$nombre_archivo.".txt";
+		if (open(archivo,">$nombre")){
+			print "cree la carpeta";
+		}
+	}
+	if ($grabar == 1){
+		print archivo "Resultado general del sorteo $id                                       Cantidad de consultas disponibles:[$cantidad_consultas]\n";
+
+	}
 	print "Resultado general del sorteo $id                                       Cantidad de consultas disponibles:[$cantidad_consultas]\n";
 	for($i = 1; $i < 169;$i++){
-		$nro = sprintf("%03d",$i);
-		print "Nro. de Sorteo $nro, le correspondió al número de orden $hash{$nro}\n";
+		my $nro = sprintf("%03d",$i);
+		my $cadena =  "Nro. de Sorteo $nro, le correspondió al número de orden $hash{$nro}\n";
+		print $cadena;
+		if ($grabar == 1){print archivo $cadena;}
 	}
 	print "\n";
 	&realizar_consulta();
@@ -190,10 +203,24 @@ sub ayuda_b(){
 
 sub opcion_b{
 	system ("clear");
+
 	print "Ganadores por sorteo                                                   Cantidad de consultas disponibles:[$cantidad_consultas]\n";
 	#aca me pude pedir ayuda
 	my $id = &solicitar_id();
 	my @grupo_lista = &pedir_grupo();
+	#print "grabar vale :$grabar\n";
+	if ($grabar == 1) {
+			print "voy a grabar\n";
+			my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+			my @lista_aux = split("_",$nombre_archivo);
+			my $nombre = "ID".$id."_".$string_grupo."_".@lista_aux[1];
+			#print "nombre del archivo:$nombre\n";
+			my $direccion = $dir_reportes.$nombre."txt";
+			#print "la dir es:$direccion\n";
+			if (open(otro_archivo,">$direccion")){
+				print "cree la carpeta";
+			}
+	}
 	system("clear");
 	foreach $grupo(@grupo_lista){
 		chomp $grupo;
@@ -203,6 +230,11 @@ sub opcion_b{
 		else{
 			my $cadena = "Ganador por sorteo del grupo $grupo: Nro de orden @list_sorteo[0],@list_sorteo[1](Nro de sorteo @list_sorteo[2])\n";
 			print $cadena;
+			if ($grabar == 1) {
+				#print "ep";
+				print otro_archivo $cadena;
+				#print otro_archivo "sasasasa";
+			}
 		}
 	}
 	print "\n";
@@ -236,10 +268,19 @@ sub opcion_c{
 	my %hash_sorteo = abrir_archivo_sorteo($nombre_archivo);
 	my @grupo_lista = &pedir_grupo();
 	system("clear");
+	if ($grabar == 1) {
+			my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+			my @lista_aux = split("_",$nombre_archivo);
+			my $nombre = "ID".$id."_".$string_grupo."_".@lista_aux[1];
+			my $direccion = $dir_reportes.$nombre."txt";
+			#print "la dir es:$direccion\n";
+			open(otro_archivo,">$direccion");
+	}
 	foreach $grupo(@grupo_lista){
 		chomp $grupo;
 		my @lista = obtener_ganador_licitacion($id,$grupo);
 		my $cadena = "Ganador por licitación del grupo $grupo: numero de orden @lista[0], @lista[1] con @lista[2] (Nro de Sorteo @lista[3])\n";
+		if($grabar == 1) {print otro_archivo $cadena;}
 		print $cadena;
 	}
 	print "\n";
@@ -282,10 +323,28 @@ sub opcion_d{
 	print "Ganadores por Grupo en el acto de adjudicación de fecha:$fecha, Sorteo: ID$id)\n";
 	foreach $grupo(@grupo_lista){
 		chomp $grupo;
+
+		if ($grabar == 1) {
+				my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+				my @lista_aux = split("_",$nombre_archivo);
+				my $nombre = "ID".$id."_".$grupo."_".$fecha;
+				my $direccion = $dir_reportes.$nombre."txt";
+				#print "la dir es:$direccion\n";
+				open(otro_archivo,">$direccion");
+		}
+
 		@lista_licitacion = &obtener_ganador_licitacion($id,$grupo);
 		@lista_sorteo = &obtener_ganador_grupo($id,$grupo);
-		print "$grupo-@lista_sorteo[0] S ( @lista_sorteo[1])\n";
-		print "$grupo-@lista_licitacion[0] L ( @lista_licitacion[1])\n";
+		$una_cadena = "$grupo-@lista_sorteo[0] S ( @lista_sorteo[1])\n";
+		$otra_cadena = "$grupo-@lista_licitacion[0] L ( @lista_licitacion[1])\n";
+
+		if ($grabar == 1){
+			print otro_archivo $una_cadena;
+			print otro_archivo $otra_cadena;
+		}
+		print $una_cadena;
+		print $otra_cadena;
+		close(otro_archivo);
 	}
 	print "\n";
 	&realizar_consulta();
@@ -336,13 +395,13 @@ sub pedir_grupo{
 	print "Si desea ingresar distinto grupos ingrese: grupo1 grupo2 grupo3\n";
 	print "Si desea procesar TODOS los grupos no debe ingresar nada\n";
 	print "Por favor ingrese el/los grupo/s que desea procesar:";
-	my $grupo = <STDIN>;
-	chomp $grupo;
-	if ($grupo=~/-/){
-		@lista_aux = split ("-",$grupo);
+	$string_grupo = <STDIN>;
+	chomp $string_grupo;
+	if ($string_grupo=~/-/){
+		@lista_aux = split ("-",$string_grupo);
 		@lista = (@lista_aux[0]..@lista_aux[1]);
 	}else{
-		@lista = split(" ",$grupo);
+		@lista = split(" ",$string_grupo);
 	}
 	@lista;
 }
@@ -350,12 +409,15 @@ sub pedir_grupo{
 #Esta subrutina se encarga de dado un ID de sorteo y un nro de Grupo poder
 #obtener el ganador del grupo por sorteo
 sub obtener_ganador_grupo{
-	#print "obtener_grupo...\n";
+	#print "obtener_ganador_grupo...\n";
 	my $ID = @_[0];
 	my $GRUPO = @_[1];
+	#print "id:$ID grupo:$GRUPO";
 	my $nombre_archivo = &obtener_nombre_archivo_sorteo($ID);
 	#obtengo los participantes del grupo
-	my %participantes_del_grupo = buscar_grupo($GRUPO);
+	my %participantes_del_grupo = &buscar_grupo($GRUPO);
+	#print "participantes_del_grupo\n";
+	#print "$_ a $participantes_del_grupo{$_}" for (keys %participantes_del_grupo);
 	$size = (keys %participantes_del_grupo);
 	if ($size != 1){
 		#obtengo el sorteo según el ID que me pasaron
@@ -414,8 +476,7 @@ sub obtener_nombre_archivo_licitacion{
 #grupo es ABIERTO, en caso de cumplirse llama a &procesar_grupo y retorna
 #lo integrantes del mismo
 #Si el grupo es CERRADO sólo imprime un aviso
-sub buscar_grupo
-{
+sub buscar_grupo{
 	my %clientes = {};
 	my $estado = 0;
 	if (open(archivo,"<",$dir_grupo)){
