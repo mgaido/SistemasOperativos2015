@@ -52,13 +52,13 @@ MAEDIR=$GRUPO/maestros
 LOGDIR=$GRUPO/bitacoras
 CONFDIR=$GRUPO/config
 
-logInicio(){
+function logInicio(){
   bash GrabarBitacora.sh $comando 'Inicio de '$comando 'INFO'
   archivosAProcesar=$(find $OKDIR -name '*.csv.xls' | wc -l)
   bash GrabarBitacora.sh $comando 'Cantidad de archivos a procesar: '$archivosAProcesar 'INFO'
 }
 
-chequearEntero(){
+function chequearEntero(){
   regExprEntero='^[0-9]+$'
   if ! [[ $1 =~ $regExprEntero ]] ; then
     echo 0
@@ -69,7 +69,7 @@ chequearEntero(){
   fi
 }
 
-chequearDecimal(){
+function chequearDecimal(){
   regExprDecimal='^[0-9]+([,][0-9]+)?$'
   if ! [[ $1 =~ $regExprDecimal ]] ; then
     echo 0
@@ -80,7 +80,7 @@ chequearDecimal(){
   fi
 }
 
-chequearDuplicados(){
+function chequearDuplicados(){
   if [ -f "$PROCDIR/$1" ]
   then
     echo 1
@@ -91,7 +91,7 @@ chequearDuplicados(){
   fi
 }
 
-rechazarRegistro(){
+function rechazarRegistro(){
   nombreArchivo=$1
   razonRechazo=$2
   linea=$3
@@ -104,7 +104,7 @@ rechazarRegistro(){
   return
 }
 
-aceptarRegistro(){
+function aceptarRegistro(){
   nombreArchivo=$1
   codigoConcesionario=$(echo $nombreArchivo | cut -f1 -d'_')
   fechaArchivo=$(echo $nombreArchivo | cut -f2 -d'_')
@@ -122,7 +122,7 @@ aceptarRegistro(){
   return
 }
 
-chequearEstructuraArchivo(){
+function chequearEstructuraArchivo(){
   local linea=$1
   # Chequeo la cantidad de delimitadores
   cantidadDemilitadores=$(echo $linea | grep -o ";" | wc -l)
@@ -135,7 +135,7 @@ chequearEstructuraArchivo(){
   fi
 }
 
-buscarFechaAdjudicacion(){
+function buscarFechaAdjudicacion(){
   fechasAdjudicacion=$MAEDIR/FechasAdj.csv
   while read linea; do
     fecha=$(echo $linea | cut -f1 -d';')
@@ -156,7 +156,7 @@ buscarFechaAdjudicacion(){
   echo 0;
 }
 
-buscarContratoFusionado(){
+function buscarContratoFusionado(){
   local grupo=$1
   local orden=$2
   padron=$MAEDIR/temaK_padron.csv.xls
@@ -179,7 +179,7 @@ buscarContratoFusionado(){
   fi
 }
 
-chequearGrupo(){
+function chequearGrupo(){
   local grupo=$1
   local grupos=$MAEDIR/grupos.csv.xls
 
@@ -206,7 +206,7 @@ chequearGrupo(){
   fi
 }
 
-chequearValorImporte(){
+function chequearValorImporte(){
   importe=$1
   cuotaPura=$2
   cuotasPendientes=$3
@@ -266,7 +266,7 @@ chequearValorImporte(){
 }
 
 
-procesarRegistro(){
+function procesarRegistro(){
   local linea=$1
   local nombreArchivo=$2
   local fechaAdjudicacion=$3
@@ -353,7 +353,7 @@ procesarArchivo(){
   bash GrabarBitacora.sh $comando "Registros leídos = "$contadorProcesados" : cantidad de ofertas validas "$contadorAceptados" cantidad de ofertas rechazadas = "$contadorRechazados 'INFO'
 }
 
-main(){
+function main(){
   logInicio
   archivosAProcesar=$( find $OKDIR -name '*.csv.xls' | wc -l )
   if [[ $archivosAProcesar == 0 ]]; then
