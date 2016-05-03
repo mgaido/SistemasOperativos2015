@@ -86,8 +86,75 @@ verificarInstalacion()
 		bash GrabarBitacora.sh $comando 'Componentes Faltantes: ' $mostrarFaltantes 'WAR'
 		echo Estado de la instalacion: INCOMPLETA
 		echo Componentes Faltantes: $(mostrarFaltantes)
-		#Agregar: Preguntar de reparar
+		if ofrecerReparar "Desea intentar reparar la instalacion ?"; then
+			repararInstalacion
+		else
+			return 1
+		fi
+		return 0
+	fi
+}
+
+ofrecerReparar()
+{
+	echo "$1 (Si - No)"
+	read answ
+	answ=$(echo $answ | awk '{print tolower($0)}')
+	if [[ $answ = "si" ]]; then
+		bash GrabarBitacora.sh $comando 'Se procede a reparar la instalacion' 'INFO'
+		echo Ingresa SI
+		if copiarFaltantes; then
+			return 0
+		else 
+			return 1
+		fi
+	else
+		if [[ $answ = "no" ]]; then
+			bash GrabarBitacora.sh $comando 'No se repara la instalacion' 'INFO'
+			echo Ingresa NO
+		else
+			bash GrabarBitacora.sh $comando 'Ingresa un valor no valido. No se inicia el proceso' 'WAR'
+			echo Ingresa un valor no valido. No se inicia el proceso
+		fi
 		return 1
+	fi
+}
+
+repararInstalacion()
+{
+
+	return 0
+}
+
+copiarFaltantes()
+{
+	#Copio maestros:
+	cd ..
+	copiar ./resguardo/masestros/FechasAdj.csv "$MAEDIR/FechasAdj.csv" 
+	copiar ./resguardo/masestros/concesionarios.csv.xls "$MAEDIR/concesionarios.csv.xls" 
+	copiar ./resguardo/masestros/grupos.csv.xls.csv "$MAEDIR/grupos.csv.xls" 
+	#Copio los scripts
+	copiar ./resguardo/binarios/PrepararAmbiente.sh "$BINDIR/PrepararAmbiente.sh" 
+	copiar ./resguardo/binarios/RecibirOfertas.sh "$BINDIR/RecibirOfertas.sh" 
+	copiar ./resguardo/binarios/enerarSorteo.sh "$BINDIR/GenerarSorteo.sh" 
+	copiar ./resguardo/binarios/ProcesarOfertas.sh "$BINDIR/ProcesarOfertas.sh" 
+	#copiar $BACKUP/binarios/DeterminarGanadores.pl "$BINDIR/DeterminarGanadores.pl" 
+	#copiar $BACKUP/binarios/LanzarProceso.sh "$BINDIR/LanzarProceso.sh" 
+	#copiar $BACKUP/binarios/DetenerProceso.sh "$BINDIR/DetenerProceso.sh" 
+	copiar ./resguardo/binarios/MoverArchivos.sh "$BINDIR/MoverArchivos.sh" 
+	copiar ./resguardobinarios/GrabarBitacora.sh "$BINDIR/GrabarBitacora.sh" 
+	copiar ./resguardo/binarios/MostrarBitacora.sh "$BINDIR/MostrarBitacora.sh" 
+}
+
+copiar()
+{
+	if [[ ! -f "$2" ]]; then
+		if [[ -f "$1" ]]; then
+			cp -n "$1" "$2"
+		else
+			echo No se puede reparar la instalacion, pues no se encuentra $1
+			exit 1
+		fi
 	fi
 }
 
@@ -98,7 +165,7 @@ verificarPermisos()
 	verificarPermisoLectura "$MAEDIR/grupos.csv.xls" || return 1
 	verificarPermisoEjecucion "$BINDIR/PrepararAmbiente.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/RecibirOfertas.sh" || return 1		
-	#verificarPermisoEjecucion "$GRUPO/GenerarSorteo.sh" || return 1
+	verificarPermisoEjecucion "$BINDIR/GenerarSorteo.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/ProcesarOfertas.sh" || return 1
 	#verificarPermisoEjecucion "$BINDIR/DeterminarGanadores.pl" || return 1
 	#verificarPermisoEjecucion "$BINDIR/LanzarProceso.sh" || return 1
