@@ -3,11 +3,22 @@ use Data::Dumper;
 
 	#
 	# #< para leer
-$dir_reportes = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/reportes/";
-$dir_licitacion = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/validas/";
-$directorio = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/sorteos/";
-$dir_grupo = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros/grupos.csv.xls";
-$dir_clientes = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros/temaK_padron.csv.xls";
+
+$MAEDIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros";
+$PROCDIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados";
+$INFODIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/reportes/";
+
+#$dir_reportes = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/reportes/";
+$dir_reportes = $INFODIR;
+#$dir_licitacion = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/validas/";
+$dir_licitacion = $PROCDIR."/validas/";
+#$directorio = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/sorteos/";
+$directorio = $PROCDIR."/sorteos/";
+print "directorio:$directorio";
+#$dir_grupo = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros/grupos.csv.xls";
+$dir_grupo = $MAEDIR."/grupos.csv.xls";
+#$dir_clientes = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros/temaK_padron.csv.xls";
+$dir_clientes = $MAEDIR."/temaK_padron.csv.xls";
 $grabar = 0; #seria falso
 $cantidad_consultas = 11;
 
@@ -56,7 +67,8 @@ sub un_solo_proceso{
 				$cont++;
 			}
 		}
-		if ( 1 < $cont ){
+		if ( 2 < $cont ){
+			print "cont:$cont";
 			return 0;
 		}
 		return 1;
