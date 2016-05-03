@@ -9,7 +9,36 @@ $dir_clientes = "/home/cristian/Dropbox/SisOp/tp/Gruopo09/maestros/temaK_padron.
 $grabar = 0; #seria falso
 $cantidad_consultas = 11;
 
-&menu_principal();
+# if (un_solo_proceso() == 0){
+# 	print "Un proceso de perl se esta ejecutando\n";
+# }else{
+	menu_principal();
+#}
+
+
+
+sub un_solo_proceso{
+	print "entré";
+	if (open(FILE, "ps -Af|")){
+		print "pepe";
+		$cont=0;
+		while (my $linea = <FILE>){
+			print "$linea\n";
+			if($linea=~/DeterminarGanadores.pl/){
+				$cont++;
+			}
+		}
+		if ( 0 < $cont ){
+			print "cantidad es:$cont";
+			return 0;
+		}
+		return 1;
+	}
+	return 1;
+}
+
+
+
 
 sub menu_principal(){
 	$cantidad_consultas--;
