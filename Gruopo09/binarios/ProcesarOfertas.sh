@@ -100,7 +100,7 @@ function rechazarRegistro(){
 
   user=`whoami`
   fecha=`date +%Y%m%d-%H:%M:%S`
-  echo $nombreArchivo";"$razonRechazo";"$linea";"$user";"$fecha >> $NOKDIR/$codigoConcesionario.rech
+  echo $nombreArchivo";"$razonRechazo";"$linea";"$user";"$fecha >> $PROCDIR/rechazadas/$codigoConcesionario.rech
   return
 }
 
@@ -118,7 +118,7 @@ function aceptarRegistro(){
   fecha=`date +%Y%m%d-%H:%M:%S`
 
   echo 'estoy aceptando un registro'
-  echo $codigoConcesionario";"$fechaArchivo";"$contratoFUsionado";"$grupo";"$orden";"$importe";"$nombreSuscriptor";"$user";"$fecha >> $OKDIR/$fechaAdjudicacion.txt
+  echo $codigoConcesionario";"$fechaArchivo";"$contratoFUsionado";"$grupo";"$orden";"$importe";"$nombreSuscriptor";"$user";"$fecha >> $PROCDIR/validas/$fechaAdjudicacion.txt
   return
 }
 
@@ -371,7 +371,7 @@ function main(){
           if [[ $estructuraValida == 0 ]]
           then
             echo `procesarArchivo $filename $fechaAdjudicacion`
-            bash MoverArchivos.sh $filename $PROCDIR $comando
+            bash MoverArchivos.sh $filename $PROCDIR/procesadas $comando
           else
             echo 'Se rechaza archivo '$(basename $filename)' porque no corresponde con el formato esperado'
             bash MoverArchivos.sh $filename $NOKDIR $comando
