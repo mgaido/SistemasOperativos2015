@@ -10,21 +10,20 @@
 #Mueve los archivos a través del "MoverArchivos".
 #Graba en el archivo de Log a través del "GrabarBitacora".
 #Invoca, si corresponde, el siguiente proceso: "ProcesarOfertas".
-
-: <<'DEBUG'
+#: <<'DEBUG'
 #ESTO ES SOLO PARA DEPURAR EL PROGRAMA, QUITAR PARA LA INTEGRACIÓN:
-declare EJECUTADOEN="/home/kubuntu/Documents/so2016/Grupo09/binarios/";
+#declare EJECUTADOEN="/home/kubuntu/Documents/so2016/Grupo09/binarios/";
 #Declaro las variables necesarias para poder probrar este script:
-declare -x ARRIDIR="${EJECUTADOEN}../arribados";
-declare -x BINDIR="${EJECUTADOEN}../binarios";
-declare -x MAEDIR="${EJECUTADOEN}../maestros";
-declare -x NOKDIR="${EJECUTADOEN}../rechazados";
-declare -x OKDIR="${EJECUTADOEN}../aceptados";
-declare -x SLEEPTIME=3;
+#declare -x ARRIDIR="${EJECUTADOEN}../arribados";
+#declare -x BINDIR="${EJECUTADOEN}../binarios";
+#declare -x MAEDIR="${EJECUTADOEN}../maestros";
+#declare -x NOKDIR="${EJECUTADOEN}../rechazados";
+#declare -x OKDIR="${EJECUTADOEN}../aceptados";
+#declare -x SLEEPTIME=3;
 #Declaro las variables necesarias para poder usar "GrabarBitacora":
-declare -x LOGDIR="${EJECUTADOEN}../bitacoras";
-declare -x LOGSIZE=4000;
-DEBUG
+#declare -x LOGDIR="${EJECUTADOEN}../bitacoras";
+#declare -x LOGSIZE=4000;
+#DEBUG
 
 
 #Declaro la constante que indica el nombre con el que este programa ingresa mensajes en el archivo de log.
@@ -34,7 +33,7 @@ declare -r PROCESAROFERTAS_ARCHIVO="ProcesarOfertas.sh";
 #Declaro la constante que indica la ruta al script ProcesarOfertas.
 declare -r PROCESAROFERTAS="${BINDIR}/${PROCESAROFERTAS_ARCHIVO}";
 #Declaro las constantes que indican los nombres de los archivos maestros que este programa utiliza.
-declare -r CONCESIONARIOS_ARCHIVO_NOMBRE="concesionarios.csv";
+declare -r CONCESIONARIOS_ARCHIVO_NOMBRE="concesionarios.csv.xls";
 declare -r FECHAS_ADJ_ARCHIVO_NOMBRE="FechasAdj.csv";
 #Declaro la constante que indica la ruta al archivo maestro de concesionarios.
 declare -r CONCESIONARIOS_ARCHIVO="${MAEDIR}/${CONCESIONARIOS_ARCHIVO_NOMBRE}";
@@ -188,7 +187,6 @@ do
 	IFS=$'\n';
 
 	#Un ciclo para recorrer uno por uno los archivos del directorio de arribos.
-	ls "-1" "-v" "-p" "${ARRIDIR}" | grep '[^/]$';
 	for ARCHIVO_NOMBRE in $(ls "-1" "-v" "-p" "${ARRIDIR}" | grep '[^/]$');
 	do
 		#Veo si es un archivo de texto.
@@ -200,7 +198,7 @@ do
 			MOVEDOR "${ARRIDIR}/${ARCHIVO_NOMBRE}" "${NOKDIR}/";
 		else
 			#Ver si el nombre del archivo cumple con el formato.
-			if [[ $(echo "${ARCHIVO_NOMBRE}" | grep -c '^[0-9]\{7\}_[0-9]\{8\}.csv.xls$') != 1 ]];
+			if [[ $(echo "${ARCHIVO_NOMBRE}" | grep -c '^[0-9]\{4\}_[0-9]\{8\}.csv.xls$') != 1 ]];
 			then
 				#El nombre del archivo no cumple con el formato.
 				#echo "\"${ARRIDIR}/${ARCHIVO_NOMBRE}\""$'\t'"no cumple con el formato de nombre de archivo.";
@@ -208,7 +206,7 @@ do
 				MOVEDOR "${ARRIDIR}/${ARCHIVO_NOMBRE}" "${NOKDIR}/";
 			else
 				#Ver si la fecha en el nombre del archivo es válida.
-				$(date -d "${ARCHIVO_NOMBRE:8:4}${ARCHIVO_NOMBRE:12:2}${ARCHIVO_NOMBRE:14:2}" &> /dev/null);
+				$(date -d "${ARCHIVO_NOMBRE:5:4}${ARCHIVO_NOMBRE:9:2}${ARCHIVO_NOMBRE:11:2}" &> /dev/null);
 				EXIT_STATUS=$(echo "$?");
 				if [[ "${EXIT_STATUS}" -ne 0 ]];
 				then
@@ -227,7 +225,7 @@ do
 					else
 						#Ver si la fecha en el nombre del archivo es menor o igual que la fecha actual.
 						FECHA_ACTUAL=$(date +%Y%m%d);
-						FECHA_NOMBRE_ARCHIVO="${ARCHIVO_NOMBRE:8:4}${ARCHIVO_NOMBRE:12:2}${ARCHIVO_NOMBRE:14:2}";
+						FECHA_NOMBRE_ARCHIVO="${ARCHIVO_NOMBRE:5:4}${ARCHIVO_NOMBRE:9:2}${ARCHIVO_NOMBRE:11:2}";
 						if [[ "${FECHA_NOMBRE_ARCHIVO}" -gt "${FECHA_ACTUAL}" ]];
 						then
 							#El nombre del archivo tiene una fecha que no es menor o igual que la fecha actual.
@@ -285,14 +283,15 @@ do
 		ESTA_EJECUTANDOSE="false";
 		IFS=$'\n';
 		#Veo si se esta ejecutando el script "ProcesarOfertas".
-		for PROCESO in $(ps -e | grep "${PROCESAROFERTAS_ARCHIVO}" | awk '{ print $4 }');
-		do
-			if [[ "${PROCESO}" == "${PROCESAROFERTAS_ARCHIVO}" ]];
+
+			if [[ $(ps -ef --sort=start_time | grep "ProcesarOfertas" | grep -v "grep" | head -1 | awk '{ print $2 }') != '' ]];
+			#[[ $(ps -ef | grep -c "ProcesarOfertas") -gt "1" ]];
+
 			then
 				ESTA_EJECUTANDOSE="true";
 				LOGGEADOR "${PROCESAROFERTAS_ARCHIVO} ya se encuentra ejecutandose." "INFO";
 			fi;
-		done;
+		
 		#Si no se esta ejecutando el script "ProcesarOfertas"...
 		if [[ ${ESTA_EJECUTANDOSE} == "false" ]];
 		then

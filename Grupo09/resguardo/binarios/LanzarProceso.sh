@@ -24,7 +24,7 @@ comando="LanzarProceso"
 
 obtenerProcessID(){
   proceso=$1
-  PID=$(ps aux | grep ./$proceso | grep -v "grep" | head -1 | awk '{ print $2 }')
+  PID=$(ps -ef --sort=start_time | grep ./$proceso | grep -v "grep" | head -1 | awk '{ print $2 }')
   echo $PID
   if [ -z $PID ]; then
   	echo 0

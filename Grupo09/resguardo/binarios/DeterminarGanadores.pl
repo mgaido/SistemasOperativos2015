@@ -4,17 +4,23 @@ use Data::Dumper;
 	#
 	# #< para leer
 
-$MAEDIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros";
-$PROCDIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados";
-$INFODIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/reportes/";
-
+$grupo = `dirname \`pwd\``;
+print "grupo es:$grupo";
+chomp $grupo;
+#$MAEDIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros";
+$MAEDIR = $grupo."/maestros";
+print "maedir:$MAEDIR\n";
+#$PROCDIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados";
+$PROCDIR = $grupo."/procesados";
+#$INFODIR = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/reportes/";
+$INFODIR = $grupo."/procesados/reportes/";
 #$dir_reportes = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/reportes/";
 $dir_reportes = $INFODIR;
 #$dir_licitacion = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/validas/";
 $dir_licitacion = $PROCDIR."/validas/";
 #$directorio = "/home/cristian/Dropbox/SisOp/tp/sisop/Gruopo09/procesados/sorteos/";
 $directorio = $PROCDIR."/sorteos/";
-print "directorio:$directorio";
+#print "directorio:$directorio";
 #$dir_grupo = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros/grupos.csv.xls";
 $dir_grupo = $MAEDIR."/grupos.csv.xls";
 #$dir_clientes = "/home/cristian/Dropbox/SisOp/tp/sisop/Grupo09/maestros/temaK_padron.csv.xls";

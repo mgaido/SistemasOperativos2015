@@ -1,12 +1,15 @@
-GRUPO=/home/nacho/Grupo09=nacho=2016-05-01 10:45:00
-CONFDIR=/home/nacho/Grupo09/config=nacho=2016-05-01 10:45:00
-BINDIR=/home/nacho/Grupo09/binarios=nacho=2016-05-01 10:45:00
-MAEDIR=/home/nacho/Grupo09/maestros=nacho=2016-05-01 10:45:00
-ARRIDIR=/home/nacho/Grupo09/arribados=nacho=2016-05-01 10:45:00
-OKDIR=/home/nacho/Grupo09/aceptados=nacho=2016-05-01 10:45:00
-PROCDIR=/home/nacho/Grupo09/procesados=nacho=2016-05-01 10:45:00
-INFODIR=/home/nacho/Grupo09/informes=nacho=2016-05-01 10:45:00
-LOGDIR=/home/nacho/Grupo09/bitacoras=nacho=2016-05-01 10:45:00
-NOKDIR=/home/nacho/Grupo09/rechazados=nacho=2016-05-01 10:45:00
-CONFDIR=/home/nacho/Grupo09/config=nacho=2016-05-01 10:45:00
-IDSORTEO=1=/home/nacho/Grupo09/config=nacho=2016-05-01 10:45:00
+GRUPO=/home/nacho/Grupo09=nacho=2016-05-03 21:46:16
+CONFDIR=/home/nacho/Grupo09/config=nacho=2016-05-03 21:46:16
+BINDIR=/home/nacho/Grupo09/binarios=nacho=2016-05-03 21:46:16
+MAEDIR=/home/nacho/Grupo09/maestros=nacho=2016-05-03 21:46:16
+ARRIDIR=/home/nacho/Grupo09/arribados=nacho=2016-05-03 21:46:16
+OKDIR=/home/nacho/Grupo09/aceptados=nacho=2016-05-03 21:46:16
+PROCDIR=/home/nacho/Grupo09/procesados=nacho=2016-05-03 21:46:16
+INFODIR=/home/nacho/Grupo09/informes=nacho=2016-05-03 21:46:16
+LOGDIR=/home/nacho/Grupo09/bitacoras=nacho=2016-05-03 21:46:16
+NOKDIR=/home/nacho/Grupo09/rechazados=nacho=2016-05-03 21:46:16
+BACKUP=/home/nacho/Grupo09/resguardo=nacho=2016-05-03 21:46:16
+LOGSIZE=22=nacho=2016-05-03 21:46:16
+SLEEPTIME=2=nacho=2016-05-03 21:46:16
+IDSORTEO=13=nacho=mar may  3 21:57:23 ART 2016
+
