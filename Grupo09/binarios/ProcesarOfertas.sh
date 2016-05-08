@@ -257,7 +257,7 @@ chequearValorImporte(){
   if (( $(echo "$importe > $montoMaximo" | bc -l) )); then
     echo 1";Supera el monto maximo"
     return
-  elif (( $(echo "$importe > $montoMaximo" | bc -l) )); then
+  elif (( $(echo "$importe < $montoMinimo" | bc -l) )); then
     echo 1";No alcanza el monto minimo"
     return
   fi
