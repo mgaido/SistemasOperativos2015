@@ -75,7 +75,15 @@ cd /home/usuario/Grupo9/binario
 
 Finalizada la inicialización, se da la posibilidad de arrancar a recibir ofertas. En caso de impedir el arranque, puede ejecutarlo manualmente con el siguiente comando: 
 
-	. RecibirOfertas.sh
+	. LanzarProceso.sh RecibirOfertas.sh
 
 
 ## Sobre la ejecucion del programa:
+
+Para lanzar cualquier proceso se utiliza el comando Lanzar proceso de la siguiente manera:
+
+	. LanzarProceso.sh <Nombre del proceso o comando a ejecutar>
+
+Para detener cualquier proceso se utiliza el comando detener proceso de la siguiente manera:
+
+	. DetenerProceso.sh <Nombre del proceso o comando a detener>
