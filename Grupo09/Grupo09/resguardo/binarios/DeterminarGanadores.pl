@@ -73,8 +73,8 @@ sub un_solo_proceso{
 				$cont++;
 			}
 		}
-		if ( 2 < $cont ){
-			print "cont:$cont";
+		if ( $cont > 1  ){
+			#print "cont:$cont";
 			return 0;
 		}
 		return 1;
@@ -100,6 +100,7 @@ sub menu_principal(){
 #Esta subrutina se invoca cuando el usuario pide respescto del menu principal
 sub menu_principal_ayuda(){
 	system("clear");
+	print @_[0];
 	print "Bienvenido al programa para Determinar ganadores                       Cantidad de consultas disponibles:[$cantidad_consultas]\n";
 	print "[A] - Resultado general del sorteo\n";
 	print "[B] - Ganadores por sorteo\n";
@@ -114,13 +115,19 @@ sub menu_principal_ayuda(){
 
 sub solicitar_id{
 	print "Por favor ingrese el ID del sorteo que desea procesar:";
+	my $nombre_archivo;
 	my $id = <STDIN>;
 	chomp $id;
 	if ($id eq "-a"){
 		print "Debe ingresar un valor numérico\n";
-		$id = &solicitar_id();
+		$nombre_archivo = &solicitar_id();
 	}
-	$id;
+	my $nombre_archivo = obtener_nombre_archivo_sorteo($id);
+	if ($nombre_archivo eq ""){
+		print "El ID ingresado es incorrecto, por favor intente de nuevo\n";
+		$nombre_archivo = &solicitar_id();
+	}
+	$nombre_archivo;
 }
 
 sub elegir_opcion{
@@ -143,6 +150,8 @@ sub elegir_opcion{
 		if ($opcion =~ /C -a$/){ayuda_c();exit;}
 		if ($opcion =~ /D -a$/){ayuda_d();exit;}
 		if ($opcion eq "-a"){&menu_principal_ayuda();exit;}
+		print "La opción ingresada es inválida, por favor ingrese de nuevo\n";
+		&menu_principal_ayuda("La opción -$opcion- ingresada es inválida, por favor ingrese de nuevo\n");
 	}
 }
 
@@ -168,9 +177,12 @@ sub ayuda_a(){
 sub opcion_a{
 	system("clear");
 	print "Resultado general del sorteo                                           Cantidad de consultas disponibles:[$cantidad_consultas]\n";
-	my $id = &solicitar_id();
+	#my $id = &solicitar_id();
 	#sorteo tiene el formato sorteo{orden} = sorteo
-	my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+	my $nombre_archivo = &solicitar_id($id);
+	print "el nombre del archivo es:$nombre_archivo\n";
+
+	if ($nombre_archivo eq "") {print "la cadena es vacia";}
 	my %hash_sorteo = &abrir_archivo_sorteo($nombre_archivo);
 	#%hash va a seguir el formato %hash{sorteo} = orden;
 	my %hash;
@@ -221,28 +233,28 @@ sub ayuda_b(){
 
 sub opcion_b{
 	system ("clear");
-
 	print "Ganadores por sorteo                                                   Cantidad de consultas disponibles:[$cantidad_consultas]\n";
 	#aca me pude pedir ayuda
-	my $id = &solicitar_id();
+	my $nombre_archivo = &solicitar_id();
 	my @grupo_lista = &pedir_grupo();
 	#print "grabar vale :$grabar\n";
 	if ($grabar == 1) {
 			print "voy a grabar\n";
-			my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+			#my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
 			my @lista_aux = split("_",$nombre_archivo);
-			my $nombre = "ID".$id."_".$string_grupo."_".@lista_aux[1];
+			my $nombre = @lista_aux[0]."_S_".$string_grupo."_".@lista_aux[1];
 			#print "nombre del archivo:$nombre\n";
-			my $direccion = $dir_reportes.$nombre."txt";
+			my $direccion = $dir_reportes.$nombre.".txt";
 			#print "la dir es:$direccion\n";
 			if (open(otro_archivo,">$direccion")){
 				print "cree la carpeta";
 			}
 	}
 	system("clear");
+	print "Ganadores por sorteo                                                   Cantidad de consultas disponibles:[$cantidad_consultas]\n";
 	foreach $grupo(@grupo_lista){
 		chomp $grupo;
-		my @list_sorteo = obtener_ganador_grupo($id,$grupo);
+		my @list_sorteo = obtener_ganador_grupo($nombre_archivo,$grupo);
 		my $size = @list_sorteo;
 		if ($size == 1) {print "El grupo $grupo no se encuentra en la lista\n";}
 		else{
@@ -281,25 +293,29 @@ sub ayuda_c(){
 sub opcion_c{
 	system ("clear");
 	print "Ganadores por licitación                                               Cantidad de consultas disponibles:[$cantidad_consultas]\n";
-	my $id = &solicitar_id();
-	my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+	#my $id = &solicitar_id();
+	my $nombre_archivo = &solicitar_id();
 	my %hash_sorteo = abrir_archivo_sorteo($nombre_archivo);
 	my @grupo_lista = &pedir_grupo();
 	system("clear");
 	if ($grabar == 1) {
-			my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+		#my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
 			my @lista_aux = split("_",$nombre_archivo);
-			my $nombre = "ID".$id."_".$string_grupo."_".@lista_aux[1];
-			my $direccion = $dir_reportes.$nombre."txt";
+			my $nombre = @lista_aux[0]."_L_".$string_grupo."_".@lista_aux[1];
+			my $direccion = $dir_reportes.$nombre.".txt";
 			#print "la dir es:$direccion\n";
 			open(otro_archivo,">$direccion");
 	}
 	foreach $grupo(@grupo_lista){
 		chomp $grupo;
-		my @lista = obtener_ganador_licitacion($id,$grupo);
-		my $cadena = "Ganador por licitación del grupo $grupo: numero de orden @lista[0], @lista[1] con @lista[2] (Nro de Sorteo @lista[3])\n";
-		if($grabar == 1) {print otro_archivo $cadena;}
-		print $cadena;
+		my @lista = obtener_ganador_licitacion($nombre_archivo,$grupo);
+		my $size = @lista;
+		if ($size == 1) {print "El grupo $grupo no se encuentra en la lista\n";}
+		else{
+			my $cadena = "Ganador por licitación del grupo $grupo: numero de orden @lista[0], @lista[1] con @lista[2] (Nro de Sorteo @lista[3])\n";
+			if($grabar == 1) {print otro_archivo $cadena;}
+			print $cadena;
+		}
 	}
 	print "\n";
 	&realizar_consulta();
@@ -330,64 +346,71 @@ sub ayuda_d(){
 sub opcion_d{
 	system ("clear");
 	print "Ganadores por grupo                                                    Cantidad de consultas disponibles:[$cantidad_consultas]\n";
-	my $id = &solicitar_id();
-	my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+	#my $id = &solicitar_id();
+	my $nombre_archivo = &solicitar_id();
 	my %hash_sorteo = abrir_archivo_sorteo($nombre_archivo);
 	my @list_aux = split("_",$nombre_archivo);
 	print "el primer elemento es: @list_aux[0]";
 	my $fecha = @list_aux[1];
 	my @grupo_lista = &pedir_grupo();
 	system("clear");
-	print "Ganadores por Grupo en el acto de adjudicación de fecha:$fecha, Sorteo: ID$id)\n";
+	print "Ganadores por Grupo en el acto de adjudicación de fecha:$fecha, Sorteo: @lista_aux[0]\n";
+	if ($grabar == 1){
+			#my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+			my @lista_aux = split("_",$nombre_archivo);
+			my $nombre = @lista_aux[0]."_".$string_grupo."_".$fecha;
+			my $direccion = $dir_reportes.$nombre.".txt";
+			#print "la dir es:$direccion\n";
+			open(otro_archivo,">$direccion");
+	}
 	foreach $grupo(@grupo_lista){
 		chomp $grupo;
-
-		if ($grabar == 1) {
-				my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
-				my @lista_aux = split("_",$nombre_archivo);
-				my $nombre = "ID".$id."_".$grupo."_".$fecha;
-				my $direccion = $dir_reportes.$nombre."txt";
-				#print "la dir es:$direccion\n";
-				open(otro_archivo,">$direccion");
-		}
-
-		@lista_licitacion = &obtener_ganador_licitacion($id,$grupo);
-		@lista_sorteo = &obtener_ganador_grupo($id,$grupo);
+		@lista_sorteo = &obtener_ganador_grupo($nombre_archivo,$grupo);
+		@lista_licitacion = &obtener_ganador_licitacion($nombre_archivo,$grupo);
 		$una_cadena = "$grupo-@lista_sorteo[0] S ( @lista_sorteo[1])\n";
 		$otra_cadena = "$grupo-@lista_licitacion[0] L ( @lista_licitacion[1])\n";
-
 		if ($grabar == 1){
 			print otro_archivo $una_cadena;
 			print otro_archivo $otra_cadena;
 		}
 		print $una_cadena;
 		print $otra_cadena;
-		close(otro_archivo);
 	}
+	close(otro_archivo);
 	print "\n";
 	&realizar_consulta();
 }
 
 
 sub obtener_ganador_licitacion{
-	my $id = @_[0];
+	#my $id = @_[0];
 	my $grupo = @_[1];
-	my $nombre_archivo = &obtener_nombre_archivo_sorteo($id);
+	my $nombre_archivo = @_[0];
+	#el @_[2] es el orden del ganador por sorteo
+	#print "el orden del ganador por sorteo es:@_[2]\n";
 	my %hash_sorteo = abrir_archivo_sorteo($nombre_archivo);
-	my @list_aux = &obtener_ganador_grupo($id,$grupo);
+	my @list_aux = &obtener_ganador_grupo($nombre_archivo,$grupo);
+	#le paso el ganador del sorteo
 	my %licitacion = &abrir_archivo_licitacion($nombre_archivo,$grupo,@list_aux[0]);
 	my @importes = (keys %licitacion);
-	my @importes_sort = sort { $b <=> $a } @importes;
-	$ordenes_ganadores_cadena = $licitacion{@importes_sort[0]}; #obtengo aquellos de mayor importe
-	@ganadores_lista = split(",",$ordenes_ganadores_cadena);
-	@ganadores_lista_sort = sort{$hash_sorteo{$b} <=> $hash_sorteo{$a}}@ganadores_lista;
-	my $orden_ganador = @ganadores_lista_sort[0];
-	my $importe = @importes_sort[0];
-	my $nro_sorteo_ganador_lic = $hash_sorteo{$orden_ganador};
-	my $nombre_ganador = &obtener_nombre($grupo,$orden_ganador);
-	#print "Ganador por licitación del grupo $grupo: numero de orden $orden_ganador, $nombre_ganador con $importe (Nro de Sorteo $nro_sorteo_ganador_lic)\n";
-	my @lista_return = ($orden_ganador,$nombre_ganador,$importe,$nro_sorteo_ganador_lic);
-	@lista_return;
+	my $size = @importes;
+	if ($size != 1){
+		#obtengo el mayor importe
+		my @importes_sort = sort { $b <=> $a } @importes;
+		$ordenes_ganadores_cadena = $licitacion{@importes_sort[0]}; #obtengo aquellos de mayor importe
+		@ganadores_lista = split(",",$ordenes_ganadores_cadena);
+		@ganadores_lista_sort = sort{$hash_sorteo{$a} <=> $hash_sorteo{$b}}@ganadores_lista;
+		my $orden_ganador = @ganadores_lista_sort[0];
+		my $importe = @importes_sort[0];
+		my $nro_sorteo_ganador_lic = $hash_sorteo{$orden_ganador};
+		my $nombre_ganador = &obtener_nombre($grupo,$orden_ganador);
+		#print "Ganador por licitación del grupo $grupo: numero de orden $orden_ganador, $nombre_ganador con $importe (Nro de Sorteo $nro_sorteo_ganador_lic)\n";
+		my @lista_return = ($orden_ganador,$nombre_ganador,$importe,$nro_sorteo_ganador_lic);
+		@lista_return;
+	}
+	else{
+		return 0;
+	}
 }
 
 sub realizar_consulta(){
@@ -428,14 +451,14 @@ sub pedir_grupo{
 #obtener el ganador del grupo por sorteo
 sub obtener_ganador_grupo{
 	#print "obtener_ganador_grupo...\n";
-	my $ID = @_[0];
+	my $nombre_archivo = @_[0];
 	my $GRUPO = @_[1];
 	#print "id:$ID grupo:$GRUPO";
-	my $nombre_archivo = &obtener_nombre_archivo_sorteo($ID);
+	#my $nombre_archivo = &obtener_nombre_archivo_sorteo($ID);
 	#obtengo los participantes del grupo
 	my %participantes_del_grupo = &buscar_grupo($GRUPO);
 	#print "participantes_del_grupo\n";
-	#print "$_ a $participantes_del_grupo{$_}" for (keys %participantes_del_grupo);
+	#print "$_ a $participantes_del_grupo{$_}\n" for (keys %participantes_del_grupo);
 	$size = (keys %participantes_del_grupo);
 	if ($size != 1){
 		#obtengo el sorteo según el ID que me pasaron
@@ -446,8 +469,10 @@ sub obtener_ganador_grupo{
 			$nro_sorteo = $sorteo{$_};
 			$nro_sorteo_participantes{$nro_sorteo} = $_;
 		}
+		#print "$_ a $nro_sorteo_participantes{$_}\n" for (keys %nro_sorteo_participantes);
 		my @nros_sorteos = (keys %nro_sorteo_participantes);#obtengo los nros de sorteo
-		my @nros_de_sorteos_sort = sort { $b <=> $a } @nros_sorteos;
+		my @nros_de_sorteos_sort = sort { $a + 0 <=> $b + 0 } @nros_sorteos;
+		#print "el nro de sorteo ganador es:@nros_de_sorteos_sort[0]";
 		my $nro_orden_ganador = $nro_sorteo_participantes{@nros_de_sorteos_sort[0]};
 		my $nombre_ganador = $participantes_del_grupo{$nro_orden_ganador};
 		my @list = ($nro_orden_ganador,$nombre_ganador,@nros_de_sorteos_sort[0]);
@@ -459,7 +484,9 @@ sub obtener_ganador_grupo{
 #esta subrutina debe recibir el ID del sorteo y devolver el nombre del archivo
 #que tiene el ID ingresado
 sub obtener_nombre_archivo_sorteo{
+	my $nombre_archivo;
 	my $comparar = "ID".@_[0]."_";
+	#print "de obtener_nombre_archivo_sorteo el comparar es:$comparar\n";
 	if(opendir(DIR,$directorio)){
 		@lista = readdir(DIR);
 		foreach $file (@lista){
@@ -469,6 +496,7 @@ sub obtener_nombre_archivo_sorteo{
 			close(DIR);
 		}
 	}
+	#print "de obtener_nombre_archivo_sorteo salió :$nombre_archivo\n";
 	$nombre_archivo;
 }
 
@@ -476,16 +504,19 @@ sub obtener_nombre_archivo_sorteo{
 #Esta subrutina se encarga de encontrar el nombre del archivo de una licitacion
 #dada una fecha
 sub obtener_nombre_archivo_licitacion{
+	my $nombre_archivo;
 	$comparar = @_;
 	if(opendir(DIR,$dir_licitacion)){
 		@lista = readdir(DIR);
 		foreach $file (@lista){
 			if ($file=~/$comparar/){
+				print "file es:$file y comparar es:$comparar\n";
 				$nombre_archivo = $file;
 			}
 			close(DIR);
 		}
 	}
+	#print "el nombre del archivo de licitacion:$nombre_archivo\n";
 	$nombre_archivo;
 }
 
@@ -561,8 +592,10 @@ sub abrir_archivo_sorteo
 {
 	my %sorteo;
 	if (open(archivo,"<",$directorio.@_[0])){
+		#print "Pude abrir el archivo sorteo";
 			while(my $linea = <archivo>){
 				chomp $linea;
+				#print "la linea es:$linea";
 				@lista = split(",",$linea);
 				$nro_orden = sprintf("%03d",@lista[0]);
 				$nro_sorteo = sprintf("%03d",@lista[1]);
@@ -580,6 +613,7 @@ sub abrir_archivo_sorteo
 #abrir_archivo(ID1_13-10-2016.txt,7886)
 sub abrir_archivo_licitacion
 {
+	#print "abrir_archivo_licitacion\n";
 	my %licitacion = {};
 	my $orden_ganador_sorteo = @_[2];
 	my $grupo = @_[1];
@@ -588,13 +622,19 @@ sub abrir_archivo_licitacion
 	my @lista = split ("_",$cadena);
 	#(ID1,13-10-2016)
 	my $fecha = @lista[1];
+	#print "la fecha es:$fecha\n";
 	#fecha = 13-10-2016
 	my @lista_aux = split("-",$fecha);
 	#@lista_aux = (13,10,2016)
+	#print "la lista es:@lista_aux[2],@lista_aux[1],@lista_aux[0]\n";
 	my $direccion = @lista_aux[2].@lista_aux[1].@lista_aux[0];
 	#$direccion = 20161013
-	my $nom_archivo = &obtener_nombre_archivo_licitacion($direccion);
+	#print "la cadena es:$cadena\n";
+	#print "direccion  es:$direccion\n";
+	my $nom_archivo = $direccion.".txt";
+	#print "nom_archivo es: $nom_archivo\n";
 	if (open(archivo,"<",$dir_licitacion.$nom_archivo)){
+		#print "abri el archivo :()\n";
 		while(my $linea = <archivo>){
 			@lista = split(";",$linea);
 			my $orden = @lista[4];
@@ -610,6 +650,9 @@ sub abrir_archivo_licitacion
 				}
 			}
 		}
+		#print "este es el hash de licitacion\n";
+		#print "$_ a $licitacion{$_}\n" for (keys %licitacion);
 		%licitacion;
+
 	}
 }

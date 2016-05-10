@@ -283,20 +283,19 @@ do
 		ESTA_EJECUTANDOSE="false";
 		IFS=$'\n';
 		#Veo si se esta ejecutando el script "ProcesarOfertas".
-
-			if [[ $(ps -ef --sort=start_time | grep "ProcesarOfertas" | grep -v "grep" | head -1 | awk '{ print $2 }') != '' ]];
-			#[[ $(ps -ef | grep -c "ProcesarOfertas") -gt "1" ]];
-
-			then
-				ESTA_EJECUTANDOSE="true";
-				LOGGEADOR "${PROCESAROFERTAS_ARCHIVO} ya se encuentra ejecutandose." "INFO";
-			fi;
-		
+		#if [[ $(ps -ef --sort=start_time | grep "ProcesarOfertas" | grep -v "grep" | head -1 | awk '{ print $2 }') != '' ]];
+		if [[ $(pgrep -c "ProcesarOfertas") -gt 0 ]];
+		then
+			ESTA_EJECUTANDOSE="true";
+			LOGGEADOR "Invocación de ${PROCESAROFERTAS_ARCHIVO} pospuesta para el siguiente ciclo." "INFO";
+		fi;
 		#Si no se esta ejecutando el script "ProcesarOfertas"...
 		if [[ ${ESTA_EJECUTANDOSE} == "false" ]];
 		then
 			#Lo lanzo en segundo plano.
 			"${PROCESAROFERTAS}" &
+			PID=$(pgrep "ProcesarOfertas" | head --lines=1);
+			LOGGEADOR "${PROCESAROFERTAS_ARCHIVO} corriendo bajo el no.:${PID}" "INFO";
 		fi;
 		IFS="${IFS_BACKUP}";
 	fi;
