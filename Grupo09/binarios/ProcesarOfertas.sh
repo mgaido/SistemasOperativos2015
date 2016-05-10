@@ -40,18 +40,6 @@
 # Variable de comando
 comando="ProcesarOfertas"
 
-# Variables de directorio TODO USAR LAS DEFINIDAS EN OTRO SCRIPT
-GRUPO="$(dirname "$PWD")"
-OKDIR=$GRUPO/aceptados
-NOKDIR=$GRUPO/rechazados
-BINDIR=$GRUPO/binarios
-PROCDIR=$GRUPO/procesados
-INFODIR=$GRUPO/informes
-ARRIDIR=$GRUPO/arribados
-MAEDIR=$GRUPO/maestros
-LOGDIR=$GRUPO/bitacoras
-CONFDIR=$GRUPO/config
-
 logInicio(){
   bash GrabarBitacora.sh $comando 'Inicio de '$comando 'INFO'
   archivosAProcesar=$(find $OKDIR -name '*.csv.xls' | wc -l)
@@ -85,6 +73,28 @@ chequearDuplicados(){
   then
     echo 1
     return
+  else
+    echo 0
+    return
+  fi
+}
+
+chequearOfertaValidaDuplicada(){
+  fechaAdjudicacion=$1
+  ofertasValidas=$PROCDIR/validas/$fechaAdjudicacion.txt
+
+  contratoFusionado=$2
+
+  if [ -f "$ofertasValidas" ]
+  then
+    cantidadCoincidencias=$(grep $contratoFusionado $ofertasValidas | wc -l)
+    if [[ $cantidadCoincidencias > 0 ]]; then
+      echo 1
+      return
+    else
+      echo 0
+      return
+    fi
   else
     echo 0
     return
@@ -318,9 +328,17 @@ procesarRegistro(){
           echo 1;
           return
         else
-          aceptarRegistro $nombreArchivo $grupo $orden $importe $fechaAdjudicacion $nombreSuscriptor
-          echo 0
-          return
+          resultadoChequeoOfertaDuplicada=`chequearOfertaValidaDuplicada $fechaAdjudicacion $contratoFusionado`
+          if [[ $resultadoChequeoOfertaDuplicada != 0 ]]; then
+            razonRechazo="Oferta válida duplicada"
+            rechazarRegistro $nombreArchivo $razonRechazo $linea
+            echo 1;
+            return
+          else
+            aceptarRegistro $nombreArchivo $grupo $orden $importe $fechaAdjudicacion $nombreSuscriptor
+            echo 0
+            return
+          fi
         fi
       fi
     fi
@@ -370,15 +388,13 @@ main(){
           estructuraValida=`chequearEstructuraArchivo $firstLine`
           if [[ $estructuraValida == 0 ]]
           then
-            echo `procesarArchivo $filename $fechaAdjudicacion`
+            `procesarArchivo $filename $fechaAdjudicacion`
             bash MoverArchivos.sh $filename $PROCDIR/procesadas $comando
           else
-            echo 'Se rechaza archivo '$(basename $filename)' porque no corresponde con el formato esperado'
             bash MoverArchivos.sh $filename $NOKDIR $comando
             bash GrabarBitacora.sh $comando 'Se rechaza archivo '$(basename $filename)' porque no corresponde con el formato esperado' 'WAR'
           fi
         else
-          echo 'Se rechaza archivo '$(basename $filename)' por estar duplicado'
           bash MoverArchivos.sh $filename $NOKDIR $comando
           bash GrabarBitacora.sh $comando 'Se rechaza archivo '$(basename $filename)' por estar duplicado' 'WAR'
         fi
@@ -391,3 +407,4 @@ main(){
 }
 main
 exit
+
