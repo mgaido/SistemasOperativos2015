@@ -58,7 +58,11 @@ main(){
 
   # Si no se encontro el ID, entonces se lanza el proceso
   if [[ $codigoRetorno == 0 ]]; then
-    ./$comandoObjetivo &
+    if [[ $comandoObjetivo == "DeterminarGanadores.pl" ]]; then
+      ./$comandoObjetivo
+    else
+      ./$comandoObjetivo &
+    fi
     echo 'Se lanzó el proceso '$comandoObjetivo'.'
     bash GrabarBitacora.sh $comando 'Se lanzó el proceso '$comandoObjetivo'.' 'INFO'
     return

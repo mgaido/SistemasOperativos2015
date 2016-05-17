@@ -108,7 +108,7 @@ ofrecerReparar()
 		echo Ingresa SI
 		if copiarFaltantes; then
 			return 0
-		else 
+		else
 			return 1
 		fi
 	else
@@ -133,20 +133,20 @@ copiarFaltantes()
 {
 	#Copio maestros:
 	cd ..
-	copiar ./resguardo/masestros/FechasAdj.csv "$MAEDIR/FechasAdj.csv" 
-	copiar ./resguardo/masestros/concesionarios.csv.xls "$MAEDIR/concesionarios.csv.xls" 
-	copiar ./resguardo/masestros/grupos.csv.xls.csv "$MAEDIR/grupos.csv.xls" 
+	copiar ./resguardo/masestros/FechasAdj.csv "$MAEDIR/FechasAdj.csv"
+	copiar ./resguardo/masestros/concesionarios.csv.xls "$MAEDIR/concesionarios.csv.xls"
+	copiar ./resguardo/masestros/grupos.csv.xls.csv "$MAEDIR/grupos.csv.xls"
 	#Copio los scripts
-	copiar ./resguardo/binarios/PrepararAmbiente.sh "$BINDIR/PrepararAmbiente.sh" 
-	copiar ./resguardo/binarios/RecibirOfertas.sh "$BINDIR/RecibirOfertas.sh" 
-	copiar ./resguardo/binarios/enerarSorteo.sh "$BINDIR/GenerarSorteo.sh" 
-	copiar ./resguardo/binarios/ProcesarOfertas.sh "$BINDIR/ProcesarOfertas.sh" 
-	copiar $BACKUP/binarios/DeterminarGanadores.pl "$BINDIR/DeterminarGanadores.pl" 
-	copiar $BACKUP/binarios/LanzarProceso.sh "$BINDIR/LanzarProceso.sh" 
-	copiar $BACKUP/binarios/DetenerProceso.sh "$BINDIR/DetenerProceso.sh" 
-	copiar ./resguardo/binarios/MoverArchivos.sh "$BINDIR/MoverArchivos.sh" 
-	copiar ./resguardobinarios/GrabarBitacora.sh "$BINDIR/GrabarBitacora.sh" 
-	copiar ./resguardo/binarios/MostrarBitacora.sh "$BINDIR/MostrarBitacora.sh" 
+	copiar ./resguardo/binarios/PrepararAmbiente.sh "$BINDIR/PrepararAmbiente.sh"
+	copiar ./resguardo/binarios/RecibirOfertas.sh "$BINDIR/RecibirOfertas.sh"
+	copiar ./resguardo/binarios/enerarSorteo.sh "$BINDIR/GenerarSorteo.sh"
+	copiar ./resguardo/binarios/ProcesarOfertas.sh "$BINDIR/ProcesarOfertas.sh"
+	copiar $BACKUP/binarios/DeterminarGanadores.pl "$BINDIR/DeterminarGanadores.pl"
+	copiar $BACKUP/binarios/LanzarProceso.sh "$BINDIR/LanzarProceso.sh"
+	copiar $BACKUP/binarios/DetenerProceso.sh "$BINDIR/DetenerProceso.sh"
+	copiar ./resguardo/binarios/MoverArchivos.sh "$BINDIR/MoverArchivos.sh"
+	copiar ./resguardobinarios/GrabarBitacora.sh "$BINDIR/GrabarBitacora.sh"
+	copiar ./resguardo/binarios/MostrarBitacora.sh "$BINDIR/MostrarBitacora.sh"
 }
 
 copiar()
@@ -167,7 +167,7 @@ verificarPermisos()
 	verificarPermisoLectura "$MAEDIR/concesionarios.csv.xls" || return 1
 	verificarPermisoLectura "$MAEDIR/grupos.csv.xls" || return 1
 	verificarPermisoEjecucion "$BINDIR/PrepararAmbiente.sh" || return 1
-	verificarPermisoEjecucion "$BINDIR/RecibirOfertas.sh" || return 1		
+	verificarPermisoEjecucion "$BINDIR/RecibirOfertas.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/GenerarSorteo.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/ProcesarOfertas.sh" || return 1
 	verificarPermisoEjecucion "$BINDIR/DeterminarGanadores.pl" || return 1
@@ -278,6 +278,7 @@ setearVariablesAmbiente()
 	export MAEDIR
 	export ARRIDIR
 	export OKDIR
+	export CONFDIR
 	export PROCDIR
 	export INFODIR
 	export LOGDIR
