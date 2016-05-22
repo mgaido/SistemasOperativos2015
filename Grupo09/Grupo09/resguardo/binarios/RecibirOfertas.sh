@@ -187,10 +187,15 @@ do
 	IFS=$'\n';
 
 	#Un ciclo para recorrer uno por uno los archivos del directorio de arribos.
-	for ARCHIVO_NOMBRE in $(ls "-1" "-v" "-p" "${ARRIDIR}" | grep '[^/]$');
+	#for ARCHIVO_NOMBRE in $(ls "-1" "-v" "-p" "${ARRIDIR}" | grep '[^/]$');
+	shopt -s nullglob;
+	for ARCHIVO_RUTA in "${ARRIDIR}"/*;
 	do
+		ARCHIVO_NOMBRE="${ARCHIVO_RUTA##*/}";
+		[[ -e "${ARCHIVO_RUTA}" ]] || continue;
+		[[ ! -d "${ARCHIVO_RUTA}" ]] || continue;
 		#Veo si es un archivo de texto.
-		if [[ $(file --mime-type "${ARRIDIR}/${ARCHIVO_NOMBRE}" | grep -c "text" -) == 0 ]];
+		if [[ $(file --mime-type "${ARCHIVO_RUTA}" | grep -c "text" -) == 0 ]];
 		then
 			#El archivo no es de texto.
 			#echo "\"${ARCHIVO_NOMBRE}\""$'\t'"no es un archivo de texto.";
@@ -275,6 +280,7 @@ do
 			fi;
 		fi;
 	done;
+	shopt -u nullglob;
 	IFS=${IFS_BACKUP};
 
 	#Si hay archivos en el directorio de aceptados...

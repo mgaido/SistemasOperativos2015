@@ -105,11 +105,13 @@ rechazarRegistro(){
   nombreArchivo=$1
   razonRechazo=$2
   linea=$3
+  contratoFusionado=$(echo $linea | cut -f1 -d';')
   linea=${linea%$'\r'}
   codigoConcesionario=$(echo $nombreArchivo | cut -f1 -d'_')
 
   user=`whoami`
   fecha=`date +%Y%m%d-%H:%M:%S`
+  bash GrabarBitacora.sh $comando "Se rechaza la oferta con contrato fusionado $contratoFusionado del archivo $nombreArchivo por la razón $razonRechazo"  'INFO'
   echo $nombreArchivo";"$razonRechazo";"$linea";"$user";"$fecha >> $PROCDIR/rechazadas/$codigoConcesionario.rech
   return
 }
@@ -198,7 +200,7 @@ chequearGrupo(){
   if [[ $cantidadCoincidencias > 0 ]]; then
     linea=`grep ^$grupo";" $grupos | head -1`
     estadoGrupo=$(echo $linea | cut -f2 -d';')
-    if [ $estadoGrupo == "ABIERTO" ]; then ## Caso correcto
+    if [ $estadoGrupo == "ABIERTO" ] || [ $estadoGrupo == "NUEVO" ]; then ## Caso correcto
       valorCuotaPura=$(echo $linea | cut -f4 -d';')
       cuotasPendientes=$(echo $linea | cut -f5 -d';')
       cuotasParaLicitacion=$(echo $linea | cut -f6 -d';')
@@ -390,9 +392,21 @@ main(){
           then
             `procesarArchivo $filename $fechaAdjudicacion`
             bash MoverArchivos.sh $filename $PROCDIR/procesadas $comando
+            resultadoMover=$?
+            if [[ $resultadoMover == 0 ]]; then
+              bash GrabarBitacora.sh $comando "Se movió exitosamente el archivo de ofertas $filename al directorio $PROCDIR/procesadas" 'INFO'
+            else
+              bash GrabarBitacora.sh $comando "Ocurrió un error al mover el archivo de ofertas $filename al directorio $PROCDIR/procesadas" 'ERR'
+            fi
           else
-            bash MoverArchivos.sh $filename $NOKDIR $comando
             bash GrabarBitacora.sh $comando 'Se rechaza archivo '$(basename $filename)' porque no corresponde con el formato esperado' 'WAR'
+            bash MoverArchivos.sh $filename $NOKDIR $comando
+            resultadoMover=$?
+            if [[ $resultadoMover == 0 ]]; then
+              bash GrabarBitacora.sh $comando "Se movió exitosamente el archivo de ofertas $filename al directorio $NOKDIR" 'INFO'
+            else
+              bash GrabarBitacora.sh $comando "Ocurrió un error al mover el archivo de ofertas $filename al directorio $NOKDIR" 'ERR'
+            fi
           fi
         else
           bash MoverArchivos.sh $filename $NOKDIR $comando
@@ -407,4 +421,3 @@ main(){
 }
 main
 exit
-

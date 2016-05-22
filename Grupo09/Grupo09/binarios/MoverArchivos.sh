@@ -33,7 +33,7 @@ else
 		if [ ! -d "$Destino/dpl" ]; then
 			`mkdir "$Destino/dpl"`
 		fi
-    
+
 		Num=001
 		while [ -a "$Destino/dpl/$Archivo.$Num" ]; do
 			Num=$[$Num+1]
@@ -45,11 +45,11 @@ else
 				Num=00$Num
 			fi
 		done
-		
+		./GrabarBitacora.sh $Invocador "Grabando archivo duplicado con nombre $Archivo.$Num" WAR
 		cp "$Origen/$Archivo" "$Destino/dpl/$Archivo.$Num"
 		rm "$Origen/$Archivo"
 		exit $Ok
-        
+
     else
 	`mv "$Origen/$Archivo" "$Destino"`
  	exit $Ok
