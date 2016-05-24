@@ -42,7 +42,7 @@ if (un_solo_proceso() == 0){
 	if (ambiente_inicializado() == 0){
 		print "No se puede ejecutar porque al ambiente no inicializo de manera correcta\n";
 		print "Por favor revise que las siguientes carpetas existan:\n";
-		print "-/procesados/sorteo/\n";
+		print "-/procesados/sorteos/\n";
 		print "-/procesados/validas/\n";
 		exit;
 	}
@@ -52,6 +52,7 @@ menu_principal();
 
 
 sub ambiente_inicializado(){
+	print "$directorio + $dir_licitacion";
 	if (opendir(DIR,$directorio) && opendir(OTRO_DIR,$dir_licitacion)){
 		#print "existen ambas carpetas\n";
 		close(DIR);
@@ -73,8 +74,8 @@ sub un_solo_proceso{
 				$cont++;
 			}
 		}
-		if ( $cont > 1  ){
-			#print "cont:$cont";
+		if ( $cont > 1 ){
+			print "cont:$cont";
 			return 0;
 		}
 		return 1;
@@ -258,6 +259,7 @@ sub opcion_b{
 		my $size = @list_sorteo;
 		if ($size == 1) {print "El grupo $grupo no se encuentra en la lista\n";}
 		else{
+			#print "pepepepe:$size\n";
 			my $cadena = "Ganador por sorteo del grupo $grupo: Nro de orden @list_sorteo[0],@list_sorteo[1](Nro de sorteo @list_sorteo[2])\n";
 			print $cadena;
 			if ($grabar == 1) {
@@ -442,10 +444,34 @@ sub pedir_grupo{
 		@lista_aux = split ("-",$string_grupo);
 		@lista = (@lista_aux[0]..@lista_aux[1]);
 	}else{
+		if ($string_grupo eq ""){
+			print "todos los grupos";
+			@lista = &obtener_todos_los_grupos();
+		}
+		else{
+		print "no tiene espacio";
 		@lista = split(" ",$string_grupo);
+		}
+
 	}
 	@lista;
 }
+
+sub obtener_todos_los_grupos{
+	open(archivo,"<",$dir_grupo);
+	my @lista;
+	print "abrir el archivo de los grupos";
+	while(my $linea = <archivo>){
+		chomp $linea;
+		my @lista_aux = split(";",$linea);
+		push(@lista,@lista_aux[0]);
+	}
+	close(archivo);
+	@lista;
+}
+
+
+
 
 #Esta subrutina se encarga de dado un ID de sorteo y un nro de Grupo poder
 #obtener el ganador del grupo por sorteo
@@ -457,10 +483,14 @@ sub obtener_ganador_grupo{
 	#my $nombre_archivo = &obtener_nombre_archivo_sorteo($ID);
 	#obtengo los participantes del grupo
 	my %participantes_del_grupo = &buscar_grupo($GRUPO);
+	#if ($ESTADO_GRUPO == 2){print "el grupete es cerrado"};
+	#print "el estado del grupo es $ESTADO_GRUPO";
 	#print "participantes_del_grupo\n";
 	#print "$_ a $participantes_del_grupo{$_}\n" for (keys %participantes_del_grupo);
-	$size = (keys %participantes_del_grupo);
-	if ($size != 1){
+	my @mpepepe = (keys %participantes_del_grupo);
+	$size = @mpepepe;
+	if ($ESTADO_GRUPO != 2){
+		#print "el size esasas :$size\n";
 		#obtengo el sorteo según el ID que me pasaron
 		my %sorteo = &abrir_archivo_sorteo($nombre_archivo);
 		my %nro_sorteo_participantes;
@@ -528,6 +558,7 @@ sub obtener_nombre_archivo_licitacion{
 sub buscar_grupo{
 	my %clientes = {};
 	my $estado = 0;
+	$ESTADO_GRUPO;
 	if (open(archivo,"<",$dir_grupo)){
 		while(my $linea = <archivo>){
 			chomp $linea;
@@ -536,11 +567,14 @@ sub buscar_grupo{
 				if (@lista[1] eq "ABIERTO"){
 					%clientes = procesar_grupo(@lista[0]);
 					$estado = 1;
+					$ESTADO_GRUPO = 1;
 					last;
 				}
 				else{
 					print "No se puede procesar porque: El grupo @_[0] es CERRADO\n";
+					$ESTADO_GRUPO = 2;					
 					last;
+					
 				}
 			}
 		}
@@ -582,6 +616,10 @@ sub procesar_grupo{
 			}
 		}
 	}
+	print "participantes";
+	#my @una_lista = (keys %participantes);
+	#my $size = @una_lista;
+	#if ($size == 1){print "hay un solo participante;"}
 	%participantes;
 }
 
@@ -611,8 +649,7 @@ sub abrir_archivo_sorteo
 #de cierto grupo, el tercer parametro es el ganador por sorteo de tal manera no
 #cargarlo en el hash
 #abrir_archivo(ID1_13-10-2016.txt,7886)
-sub abrir_archivo_licitacion
-{
+sub abrir_archivo_licitacion{
 	#print "abrir_archivo_licitacion\n";
 	my %licitacion = {};
 	my $orden_ganador_sorteo = @_[2];
