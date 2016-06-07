@@ -133,13 +133,13 @@ copiarFaltantes()
 {
 	#Copio maestros:
 	cd ..
-	copiar ./resguardo/masestros/FechasAdj.csv "$MAEDIR/FechasAdj.csv"
-	copiar ./resguardo/masestros/concesionarios.csv.xls "$MAEDIR/concesionarios.csv.xls"
-	copiar ./resguardo/masestros/grupos.csv.xls.csv "$MAEDIR/grupos.csv.xls"
+	copiar ./resguardo/maestros/FechasAdj.csv "$MAEDIR/FechasAdj.csv"
+	copiar ./resguardo/maestros/concesionarios.csv.xls "$MAEDIR/concesionarios.csv.xls"
+	copiar ./resguardo/maestros/grupos.csv.xls "$MAEDIR/grupos.csv.xls"
 	#Copio los scripts
 	copiar ./resguardo/binarios/PrepararAmbiente.sh "$BINDIR/PrepararAmbiente.sh"
 	copiar ./resguardo/binarios/RecibirOfertas.sh "$BINDIR/RecibirOfertas.sh"
-	copiar ./resguardo/binarios/enerarSorteo.sh "$BINDIR/GenerarSorteo.sh"
+	copiar ./resguardo/binarios/GenerarSorteo.sh "$BINDIR/GenerarSorteo.sh"
 	copiar ./resguardo/binarios/ProcesarOfertas.sh "$BINDIR/ProcesarOfertas.sh"
 	copiar $BACKUP/binarios/DeterminarGanadores.pl "$BINDIR/DeterminarGanadores.pl"
 	copiar $BACKUP/binarios/LanzarProceso.sh "$BINDIR/LanzarProceso.sh"
